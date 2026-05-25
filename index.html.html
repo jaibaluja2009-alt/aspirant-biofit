@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AspirantBioFit</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f0f4f8;
+      --sidebar-bg: #0f2137;
+      --sidebar-hover: #1a3550;
+      --sidebar-active: #1e3f61;
+      --sidebar-text: #94b8d4;
+      --sidebar-text-active: #ffffff;
+      --card-bg: #ffffff;
+      --border: #dde5ef;
+      --text: #1a2e4a;
+      --muted: #6b8296;
+      --primary: #2563eb;
+      --primary-light: #dbeafe;
+      --accent: #10b981;
+      --accent-light: #d1fae5;
+      --warn: #f59e0b;
+      --warn-light: #fef3c7;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --radius: 12px;
+      --shadow: 0 1px 4px rgba(15,33,55,0.08), 0 4px 16px rgba(15,33,55,0.06);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-icon svg { width: 18px; height: 18px; stroke: white; fill: none; }
+    .brand-name { font-size: 15px; font-weight: 700; color: white; letter-spacing: -0.3px; }
+    .sidebar-nav { padding: 16px 12px; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; cursor: pointer;
+      color: var(--sidebar-text); font-size: 14px; font-weight: 500;
+      transition: all 0.15s; margin-bottom: 4px; user-select: none;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: white; }
+    .nav-item.active { background: var(--sidebar-active); color: white; }
+    .nav-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; flex-shrink: 0; }
+    .sidebar-tip {
+      margin: 12px; padding: 14px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 10px;
+    }
+    .sidebar-tip p { font-size: 11.5px; color: #6ecfa3; line-height: 1.5; }
+    .sidebar-tip strong { color: #34d399; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Main ── */
+    #main {
+      flex: 1; overflow-y: auto; padding: 32px 36px;
+      display: flex; flex-direction: column;
+    }
+    .page { display: none; animation: fadeUp 0.3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1.page-title { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+    p.page-sub { color: var(--muted); margin-top: 4px; font-size: 14px; margin-bottom: 28px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+    .card-body { padding: 20px 22px; }
+
+    /* ── Dashboard grid ── */
+    .dash-top { display: grid; grid-template-columns: 280px 1fr; gap: 20px; margin-bottom: 20px; }
+    .dash-bottom { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+    .dash-mood { margin-bottom: 20px; }
+
+    /* ── CEI Gauge ── */
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 22px; }
+    .gauge-svg { width: 160px; height: 160px; }
+    .gauge-score { font-size: 38px; font-weight: 800; fill: var(--accent); }
+    .gauge-label { font-size: 11px; fill: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+    .gauge-desc { font-size: 13px; color: var(--muted); text-align: center; margin-top: 14px; line-height: 1.5; max-width: 200px; }
+
+    /* ── Stat cards ── */
+    .stat-card { padding: 20px 22px; display: flex; align-items: center; gap: 16px; }
+    .stat-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .stat-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
+    .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+    .stat-icon.green { background: var(--accent-light); color: var(--accent); }
+    .stat-icon.amber { background: var(--warn-light); color: var(--warn); }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 2px; }
+    .stat-value { font-size: 22px; font-weight: 700; color: var(--text); }
+    .stat-unit { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 2px; }
+
+    /* ── Chart ── */
+    .chart-wrap { padding: 16px 22px 20px; }
+    .chart-legend { display: flex; gap: 20px; margin-bottom: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .chart-svg { width: 100%; height: 180px; }
+
+    /* ── Mood distribution ── */
+    .mood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .mood-item { text-align: center; }
+    .mood-bar-wrap { height: 60px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 8px; }
+    .mood-bar { width: 32px; border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.4s ease; }
+    .mood-name { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .mood-count { font-size: 18px; font-weight: 700; color: var(--text); }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 60px 40px; }
+    .empty-state svg { width: 56px; height: 56px; stroke: var(--border); margin: 0 auto 16px; display: block; }
+    .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary); color: white; border: none;
+      padding: 10px 20px; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ── Log Form ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 13px; font-weight: 600; color: var(--text); }
+    input[type="number"], select {
+      padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 15px; background: white; color: var(--text);
+      transition: border-color 0.15s; outline: none; width: 100%;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    select { cursor: pointer; }
+    .btn-submit {
+      width: 100%; padding: 14px; background: var(--primary); color: white;
+      border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover { background: #1d4ed8; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-date { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+    /* ── Advice Panel ── */
+    .advice-panel { margin-top: 24px; }
+    .advice-card {
+      border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--card-bg); overflow: hidden; box-shadow: var(--shadow);
+    }
+    .advice-top {
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .severity-badge {
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .sev-good { background: var(--accent-light); color: var(--accent); }
+    .sev-warning { background: var(--warn-light); color: var(--warn); }
+    .sev-critical { background: var(--danger-light); color: var(--danger); }
+    .advice-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .advice-body { padding: 20px; }
+    .advice-text { font-size: 14px; color: var(--text); line-height: 1.75; white-space: pre-line; }
+    .focus-areas { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .focus-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .focus-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .focus-chip {
+      padding: 5px 12px; background: var(--primary-light); color: var(--primary);
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .advice-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+    .advice-metric { background: var(--bg); border-radius: 10px; padding: 12px 14px; text-align: center; }
+    .am-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .am-value { font-size: 20px; font-weight: 700; color: var(--text); margin-top: 2px; }
+    .btn-log-again {
+      width: 100%; margin-top: 16px; padding: 11px; border: 1.5px solid var(--border);
+      background: white; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; color: var(--text); transition: all 0.15s;
+    }
+    .btn-log-again:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── History ── */
+    .history-list { display: flex; flex-direction: column; gap: 14px; }
+    .history-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px 22px; display: flex; align-items: center; gap: 20px;
+    }
+    .hist-date { min-width: 90px; }
+    .hist-date-day { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+    .hist-date-month { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+    .hist-metrics { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .hist-metric { }
+    .hist-metric-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .hist-metric-val { font-size: 16px; font-weight: 700; color: var(--text); }
+    .hist-right { display: flex; align-items: center; gap: 16px; }
+    .cei-badge {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; border: 2.5px solid;
+    }
+    .cei-badge.good { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
+    .cei-badge.warn { color: var(--warn); border-color: var(--warn); background: var(--warn-light); }
+    .cei-badge.bad { color: var(--danger); border-color: var(--danger); background: var(--danger-light); }
+    .mood-pill {
+      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      background: var(--primary-light); color: var(--primary);
+    }
+    .btn-delete {
+      width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border);
+      background: white; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; color: var(--muted); transition: all 0.15s; flex-shrink: 0;
+    }
+    .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
+    .btn-delete svg { width: 15px; height: 15px; stroke: currentColor; fill: none; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      #sidebar { width: 60px; min-width: 60px; }
+      .sidebar-brand .brand-name, .nav-item span, .sidebar-tip { display: none; }
+      .nav-item { justify-content: center; }
+      #main { padding: 20px 16px; }
+      .dash-top { grid-template-columns: 1fr; }
+      .dash-bottom { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .advice-summary { grid-template-columns: repeat(2, 1fr); }
+      .hist-metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" stroke-width="2.5">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <span class="brand-name">AspirantBioFit</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" data-page="dashboard">
+      <svg viewBox="0 0 24 24" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" data-page="log">
+      <svg viewBox="0 0 24 24" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      <span>Log Today</span>
+    </div>
+    <div class="nav-item" data-page="history">
+      <svg viewBox="0 0 24 24" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span>History</span>
+    </div>
+  </nav>
+  <div class="sidebar-tip">
+    <p><strong>Remember</strong>Sleep is when memory consolidation happens. Don't skip it.</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div id="main">
+
+  <!-- Dashboard -->
+  <div id="page-dashboard" class="page active">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-sub">Your cognitive and physical performance overview.</p>
+    <div id="dash-content"></div>
+  </div>
+
+  <!-- Log Form -->
+  <div id="page-log" class="page">
+    <h1 class="page-title">Daily Log</h1>
+    <p class="page-sub">Record your metrics to receive personalised biological feedback.</p>
+    <div style="max-width:640px">
+      <div id="log-form-container">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Today's Metrics</div>
+            <div class="form-date" id="form-date-label" style="margin:6px 0 0; font-size:13px; color:var(--muted);"></div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="f-study">Study Hours</label>
+                <input type="number" id="f-study" min="0" max="24" step="0.5" value="8" />
+              </div>
+              <div class="form-field">
+                <label for="f-sleep">Sleep Hours</label>
+                <input type="number" id="f-sleep" min="0" max="24" step="0.5" value="7" />
+              </div>
+              <div class="form-field">
+                <label for="f-water">Water (Glasses)</label>
+                <input type="number" id="f-water" min="0" max="30" value="8" />
+              </div>
+              <div class="form-field">
+                <label for="f-mood">Overall Mood</label>
+                <select id="f-mood">
+                  <option value="Focused">Focused</option>
+                  <option value="Balanced" selected>Balanced</option>
+                  <option value="Anxious">Anxious</option>
+                  <option value="Exhausted">Exhausted</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-submit" id="btn-submit-log">
+              Submit &amp; Generate Insights
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="advice-container" style="display:none;" class="advice-panel"></div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div id="page-history" class="page">
+    <h1 class="page-title">History</h1>
+    <p class="page-sub">All your past daily logs.</p>
+    <div id="history-content"></div>
+  </div>
+
+</div>
+
+<script>
+/* =====================
+   DATA STORE
+   ===================== */
+const STORAGE_KEY = "abf_logs_v1";
+
+function getLogs() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch { return []; }
+}
+
+function saveLogs(logs) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+}
+
+function addLog(entry) {
+  const logs = getLogs();
+  const id = Date.now();
+  logs.unshift({ ...entry, id, createdAt: new Date().toISOString() });
+  saveLogs(logs);
+  return id;
+}
+
+function deleteLog(id) {
+  const logs = getLogs().filter(l => l.id !== id);
+  saveLogs(logs);
+}
+
+/* =====================
+   CEI FORMULA
+   ===================== */
+function computeCEI(studyHours, sleepHours, waterGlasses, mood) {
+  let score = 100;
+  if (sleepHours < 5) score -= Math.min(40, (5 - sleepHours) * 13);
+  else if (sleepHours < 6) score -= Math.min(40, (6 - sleepHours) * 13);
+  else if (sleepHours >= 7) score += 5;
+  if (waterGlasses < 6) score -= Math.min(20, (6 - waterGlasses) * 5);
+  else if (waterGlasses >= 8) score += 3;
+  if (studyHours > 14 && sleepHours < 6) score -= 15;
+  if (mood === "Exhausted") score -= 12;
+  else if (mood === "Anxious") score -= 5;
+  else if (mood === "Focused") score += 6;
+  else if (mood === "Balanced") score += 8;
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function ceiClass(cei) {
+  if (cei >= 70) return "good";
+  if (cei >= 45) return "warn";
+  return "bad";
+}
+
+/* =====================
+   AI ADVISOR LOGIC
+   ===================== */
+function getAdvice(studyHours, sleepHours, waterGlasses, mood) {
+  const parts = [];
+  const focusAreas = [];
+  let severity = "good";
+
+  if (sleepHours < 5) {
+    severity = "critical"; focusAreas.push("Sleep");
+    parts.push(`Critical sleep deficit detected (${sleepHours}h). Your hippocampus performs memory consolidation during sleep — transferring studied material into long-term storage via slow-wave cycles. Below 5 hours, the brain's glymphatic system cannot clear metabolic waste including beta-amyloid, directly impairing neural signalling. Today's study session may retain less than 40% of information. Prioritise 7-8 hours tonight even if it means a shorter session tomorrow.`);
+  } else if (sleepHours < 6) {
+    severity = "warning"; focusAreas.push("Sleep");
+    parts.push(`Sleep is below the recommended threshold (${sleepHours}h). Your prefrontal cortex — responsible for complex reasoning and decision-making — is operating at reduced capacity. Research shows 6 hours of sleep impairs cognition equivalently to 24 hours of deprivation. Aim for at least 7 hours to support synaptic pruning and REM memory encoding.`);
+  } else if (sleepHours >= 7) {
+    parts.push(`Excellent sleep hygiene (${sleepHours}h). Your hippocampus is effectively consolidating memories through slow-wave and REM cycles. This is your cognitive superpower — protect this window consistently.`);
+  }
+
+  if (waterGlasses < 4) {
+    severity = "critical"; focusAreas.push("Hydration");
+    parts.push(`Severe dehydration risk (${waterGlasses} glasses). The brain is ~75% water — even 1-2% body-weight dehydration reduces cognitive performance by 10-15%. Neural transmission depends on electrolyte gradients; dehydration disrupts these gradients, slowing cortical processing speed. Drink water immediately and aim for a glass every 45 minutes during study sessions.`);
+  } else if (waterGlasses < 6) {
+    if (severity !== "critical") severity = "warning";
+    focusAreas.push("Hydration");
+    parts.push(`Hydration is below optimal (${waterGlasses} glasses). Adequate water is critical for the myelin sheath surrounding neurons — dehydration thins this sheath, reducing electrical impulse speed across neural networks. Target 8-10 glasses, especially when studying under cognitive load.`);
+  } else if (waterGlasses >= 8) {
+    parts.push(`Well-hydrated (${waterGlasses} glasses). Optimal hydration ensures efficient cerebrospinal fluid circulation, which protects neurons and clears metabolic byproducts. Your neural transmission speed is well-supported.`);
+  }
+
+  if (studyHours > 14 && sleepHours < 6) {
+    severity = "critical"; focusAreas.push("Study Balance");
+    parts.push(`Dangerous study-to-sleep ratio (${studyHours}h study / ${sleepHours}h sleep). Prolonged cognitive effort without recovery activates the HPA axis, flooding your system with cortisol. Chronically elevated cortisol damages hippocampal neurons — the very structure you need for exam performance. Diminishing returns set in after 8-10 focused hours; beyond that, you are studying but not learning.`);
+  } else if (studyHours > 10) {
+    if (severity === "good") severity = "warning";
+    focusAreas.push("Breaks");
+    parts.push(`High study load (${studyHours}h). Ensure you are applying spaced repetition and the Pomodoro technique — your brain's default mode network (DMN) requires brief rest periods to consolidate learning. No breaks means no integration, regardless of hours logged.`);
+  } else if (studyHours >= 6) {
+    parts.push(`Study volume is well-calibrated (${studyHours}h). This range maximises active recall without triggering cognitive fatigue cascades. Focus on retrieval practice rather than passive re-reading for optimal long-term memory encoding.`);
+  }
+
+  if (mood === "Exhausted") {
+    if (severity !== "critical") severity = "warning";
+    focusAreas.push("Recovery");
+    parts.push(`Exhaustion signals depletion of neurotransmitter reserves — particularly dopamine and serotonin. Consider a 20-minute NSDR (Non-Sleep Deep Rest) or yoga nidra session. Stanford research shows this replenishes dopamine in the striatum and restores alertness comparably to a 90-minute nap.`);
+  } else if (mood === "Anxious") {
+    if (severity === "good") severity = "warning";
+    focusAreas.push("Stress Management");
+    parts.push(`Anxiety activates your amygdala's threat response, diverting blood flow from the prefrontal cortex to survival circuits — impairing analytical thinking. Try 4-7-8 breathing (inhale 4s, hold 7s, exhale 8s) for 3 cycles before studying. This activates the parasympathetic nervous system and reduces cortisol within minutes.`);
+  } else if (mood === "Focused") {
+    parts.push(`High focus state — elevated norepinephrine and acetylcholine indicate your brain is primed for encoding new information. Capitalise on this window for the most demanding material: complex problem-solving and new concept acquisition.`);
+  } else if (mood === "Balanced") {
+    parts.push(`A balanced state reflects healthy autonomic nervous system regulation. Your cortisol-to-DHEA ratio is favourable — a biological marker of resilience and sustainable performance.`);
+  }
+
+  if (focusAreas.length === 0 && severity === "good") {
+    parts.push(`Your habits today are supporting optimal cognitive function. Consistent application of these patterns — 7-8h sleep, 8+ glasses of water, and structured study — creates compounding neurobiological benefits. Long-term potentiation (LTP) in your hippocampus is strengthening, which directly improves retention for high-density subjects like organic chemistry and physics.`);
+  }
+
+  return { advice: parts.join("\n\n"), focusAreas, severity };
+}
+
+/* =====================
+   ROUTING
+   ===================== */
+let currentPage = "dashboard";
+
+function navigate(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.getElementById(`page-${page}`).classList.add("active");
+  document.querySelector(`[data-page="${page}"]`).classList.add("active");
+  currentPage = page;
+  if (page === "dashboard") renderDashboard();
+  if (page === "history") renderHistory();
+}
+
+document.querySelectorAll(".nav-item").forEach(item => {
+  item.addEventListener("click", () => navigate(item.dataset.page));
+});
+
+/* =====================
+   HELPERS
+   ===================== */
+function formatDate(isoDate) {
+  const d = new Date(isoDate + "T00:00:00");
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+function dateLabel(isoDate) {
+  const d = new Date(isoDate + "T00:00:00");
+  return { day: d.getDate(), month: d.toLocaleString("en-GB", { month: "short" }), weekday: d.toLocaleString("en-GB", { weekday: "short" }) };
+}
+function todayISO() {
+  return new Date().toISOString().split("T")[0];
+}
+function niceNow() {
+  return new Date().toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+}
+
+/* =====================
+   SVG GAUGE
+   ===================== */
+function renderGauge(score) {
+  const r = 65, cx = 80, cy = 80;
+  const circumference = 2 * Math.PI * r;
+  const start = 135, end = 405; // 270 degree arc
+  const arcLen = (270 / 360) * circumference;
+  const fillLen = (score / 100) * arcLen;
+  const color = score >= 70 ? "#10b981" : score >= 45 ? "#f59e0b" : "#ef4444";
+
+  function polarToCart(angle) {
+    const rad = (angle - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function describeArc(startAngle, endAngle) {
+    const s = polarToCart(startAngle), e = polarToCart(endAngle);
+    const large = endAngle - startAngle > 180 ? 1 : 0;
+    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+  }
+
+  const trackEnd = end > 360 ? end - 360 + start : end;
+  // Track from 135 to 45 (going clockwise 270 degrees)
+  const trackPath = describeArc(135, 135 + 270);
+  // Fill: proportional arc
+  const fillEnd = 135 + (score / 100) * 270;
+  const fillPath = score > 0 ? describeArc(135, fillEnd) : "";
+
+  return `
+    <svg class="gauge-svg" viewBox="0 0 160 160">
+      <path d="${trackPath}" fill="none" stroke="#e5ecf4" stroke-width="10" stroke-linecap="round"/>
+      ${score > 0 ? `<path d="${fillPath}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"/>` : ""}
+      <text x="80" y="78" text-anchor="middle" class="gauge-score" style="font-size:34px;font-weight:800;fill:${color}">${score}</text>
+      <text x="80" y="97" text-anchor="middle" class="gauge-label" style="font-size:10px;fill:#6b8296;font-weight:600">SCORE</text>
+    </svg>
+  `;
+}
+
+/* =====================
+   SVG LINE CHART
+   ===================== */
+function renderLineChart(logs) {
+  const width = 500, height = 160, padL = 30, padR = 10, padT = 12, padB = 28;
+  const w = width - padL - padR;
+  const h = height - padT - padB;
+
+  if (logs.length === 0) return `<svg class="chart-svg" viewBox="0 0 ${width} ${height}"></svg>`;
+
+  const studyVals = logs.map(l => parseFloat(l.studyHours));
+  const sleepVals = logs.map(l => parseFloat(l.sleepHours));
+  const allVals = [...studyVals, ...sleepVals];
+  const minV = 0, maxV = Math.max(14, ...allVals) + 1;
+
+  function xPos(i) { return padL + (i / (logs.length - 1 || 1)) * w; }
+  function yPos(v) { return padT + h - ((v - minV) / (maxV - minV)) * h; }
+
+  function makePath(vals, color) {
+    if (vals.length === 1) return `<circle cx="${xPos(0)}" cy="${yPos(vals[0])}" r="4" fill="${color}"/>`;
+    const pts = vals.map((v, i) => `${xPos(i)},${yPos(v)}`).join(" L ");
+    return `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+
+  const dateLabels = logs.map(l => {
+    const d = new Date(l.date + "T00:00:00");
+    return d.toLocaleString("en-GB", { weekday: "short" });
+  });
+
+  // Gridlines
+  const gridLines = [0, 3, 6, 9, 12].filter(v => v <= maxV).map(v => {
+    const y = yPos(v);
+    return `<line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="#e5ecf4" stroke-width="1"/>
+            <text x="${padL - 6}" y="${y + 4}" text-anchor="end" font-size="10" fill="#94a3b8">${v}</text>`;
+  }).join("");
+
+  return `
+    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+      ${gridLines}
+      ${makePath(studyVals, "#1e3f61")}
+      ${makePath(sleepVals, "#10b981")}
+      ${dateLabels.map((d, i) => `<text x="${xPos(i)}" y="${height - 6}" text-anchor="middle" font-size="10" fill="#94a3b8">${d}</text>`).join("")}
+    </svg>
+  `;
+}
+
+/* =====================
+   RENDER DASHBOARD
+   ===================== */
+function renderDashboard() {
+  const allLogs = getLogs();
+  const sevenAgo = new Date(); sevenAgo.setDate(sevenAgo.getDate() - 6);
+  const isoAgo = sevenAgo.toISOString().split("T")[0];
+  const weekLogs = allLogs.filter(l => l.date >= isoAgo);
+  const chartLogs = [...weekLogs].sort((a, b) => a.date.localeCompare(b.date));
+
+  const el = document.getElementById("dash-content");
+
+  if (allLogs.length === 0) {
+    el.innerHTML = `
+      <div class="card"><div class="card-body">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-3c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/>
+          </svg>
+          <h3>No data yet</h3>
+          <p>Start by logging your first daily entry to see your Cognitive Efficiency Index and insights.</p>
+          <button class="btn-primary" onclick="navigate('log')">Log Today's Metrics</button>
+        </div>
+      </div></div>`;
+    return;
+  }
+
+  const avg = (arr, fn) => arr.length ? arr.reduce((s, l) => s + fn(l), 0) / arr.length : 0;
+  const avgStudy = avg(weekLogs, l => parseFloat(l.studyHours));
+  const avgSleep = avg(weekLogs, l => parseFloat(l.sleepHours));
+  const avgWater = avg(weekLogs, l => l.waterGlasses);
+
+  const moodDist = {};
+  weekLogs.forEach(l => { moodDist[l.mood] = (moodDist[l.mood] || 0) + 1; });
+  const moods = ["Focused", "Anxious", "Exhausted", "Balanced"];
+  const moodColors = { Focused: "#2563eb", Anxious: "#f59e0b", Exhausted: "#ef4444", Balanced: "#10b981" };
+  const maxMood = Math.max(1, ...Object.values(moodDist));
+
+  const ceiAvg = weekLogs.length
+    ? Math.round(weekLogs.reduce((s, l) => s + computeCEI(parseFloat(l.studyHours), parseFloat(l.sleepHours), l.waterGlasses, l.mood), 0) / weekLogs.length)
+    : 0;
+
+  el.innerHTML = `
+    <div class="dash-top">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Cognitive Efficiency Index</div></div>
+        <div class="gauge-wrap">
+          ${renderGauge(ceiAvg)}
+          <p class="gauge-desc">Higher scores indicate a sustainable balance of studying and recovery.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">7-Day Performance Trend</div></div>
+        <div class="chart-wrap">
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#1e3f61"></div>Study (hrs)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Sleep (hrs)</div>
+          </div>
+          ${renderLineChart(chartLogs)}
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-bottom">
+      <div class="card stat-card">
+        <div class="stat-icon blue">
+          <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M3 21v-1a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v1"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Avg Study Time</div>
+          <div class="stat-value">${avgStudy.toFixed(1)}<span class="stat-unit">hrs/day</span></div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon green">
+          <svg viewBox="0 0 24 24" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Avg Sleep Time</div>
+          <div class="stat-value">${avgSleep.toFixed(1)}<span class="stat-unit">hrs/day</span></div>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon amber">
+          <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Avg Hydration</div>
+          <div class="stat-value">${avgWater.toFixed(1)}<span class="stat-unit">glasses</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-mood card">
+      <div class="card-header"><div class="card-title">Mood Distribution (Last 7 Days)</div></div>
+      <div class="card-body">
+        <div class="mood-grid">
+          ${moods.map(m => {
+            const cnt = moodDist[m] || 0;
+            const barH = weekLogs.length ? Math.round((cnt / maxMood) * 56) : 4;
+            return `<div class="mood-item">
+              <div class="mood-bar-wrap"><div class="mood-bar" style="height:${barH}px;background:${moodColors[m]}"></div></div>
+              <div class="mood-count">${cnt}</div>
+              <div class="mood-name">${m}</div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =====================
+   RENDER HISTORY
+   ===================== */
+function renderHistory() {
+  const logs = getLogs();
+  const el = document.getElementById("history-content");
+
+  if (logs.length === 0) {
+    el.innerHTML = `<div class="card"><div class="card-body"><div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <h3>No logs yet</h3>
+      <p>Your history will appear here after you log your first day.</p>
+      <button class="btn-primary" onclick="navigate('log')">Log Today</button>
+    </div></div></div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="history-list">${logs.map(log => {
+    const cei = computeCEI(parseFloat(log.studyHours), parseFloat(log.sleepHours), log.waterGlasses, log.mood);
+    const cls = ceiClass(cei);
+    const { day, month, weekday } = dateLabel(log.date);
+    return `
+      <div class="history-card" id="hcard-${log.id}">
+        <div class="hist-date">
+          <div class="hist-date-day">${day}</div>
+          <div class="hist-date-month">${month}</div>
+          <div class="hist-date-month" style="color:var(--muted)">${weekday}</div>
+        </div>
+        <div class="hist-metrics">
+          <div class="hist-metric">
+            <div class="hist-metric-label">Study</div>
+            <div class="hist-metric-val">${parseFloat(log.studyHours)}h</div>
+          </div>
+          <div class="hist-metric">
+            <div class="hist-metric-label">Sleep</div>
+            <div class="hist-metric-val">${parseFloat(log.sleepHours)}h</div>
+          </div>
+          <div class="hist-metric">
+            <div class="hist-metric-label">Water</div>
+            <div class="hist-metric-val">${log.waterGlasses} gl</div>
+          </div>
+        </div>
+        <div class="hist-right">
+          <div class="mood-pill">${log.mood}</div>
+          <div class="cei-badge ${cls}">${cei}</div>
+          <button class="btn-delete" onclick="handleDelete(${log.id})" title="Delete">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>`;
+  }).join("")}</div>`;
+}
+
+function handleDelete(id) {
+  deleteLog(id);
+  const card = document.getElementById(`hcard-${id}`);
+  if (card) { card.style.opacity = "0"; card.style.transition = "opacity 0.2s"; setTimeout(() => renderHistory(), 220); }
+}
+
+/* =====================
+   LOG FORM
+   ===================== */
+document.getElementById("form-date-label").textContent = niceNow();
+
+document.getElementById("btn-submit-log").addEventListener("click", () => {
+  const study = parseFloat(document.getElementById("f-study").value);
+  const sleep = parseFloat(document.getElementById("f-sleep").value);
+  const water = parseInt(document.getElementById("f-water").value, 10);
+  const mood = document.getElementById("f-mood").value;
+
+  if (isNaN(study) || study < 0 || study > 24) return alert("Study hours must be between 0 and 24.");
+  if (isNaN(sleep) || sleep < 0 || sleep > 24) return alert("Sleep hours must be between 0 and 24.");
+  if (isNaN(water) || water < 0 || water > 30) return alert("Water glasses must be between 0 and 30.");
+
+  const btn = document.getElementById("btn-submit-log");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner"></div> Analysing...`;
+
+  setTimeout(() => {
+    const date = todayISO();
+    addLog({ date, studyHours: study, sleepHours: sleep, waterGlasses: water, mood });
+    const result = getAdvice(study, sleep, water, mood);
+    const cei = computeCEI(study, sleep, water, mood);
+
+    document.getElementById("log-form-container").style.display = "none";
+
+    const sevClass = { good: "sev-good", warning: "sev-warning", critical: "sev-critical" }[result.severity];
+    const sevLabel = { good: "Optimal", warning: "Needs Attention", critical: "Critical" }[result.severity];
+
+    document.getElementById("advice-container").style.display = "block";
+    document.getElementById("advice-container").innerHTML = `
+      <div class="advice-card">
+        <div class="advice-top">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <div class="advice-title">Biological Insight</div>
+          <div class="severity-badge ${sevClass}">${sevLabel}</div>
+        </div>
+        <div class="advice-body">
+          <div class="advice-text">${result.advice}</div>
+          ${result.focusAreas.length ? `
+            <div class="focus-areas">
+              <div class="focus-label">Priority Focus Areas</div>
+              <div class="focus-chips">${result.focusAreas.map(a => `<span class="focus-chip">${a}</span>`).join("")}</div>
+            </div>` : ""}
+          <div class="advice-summary">
+            <div class="advice-metric"><div class="am-label">Study</div><div class="am-value">${study}h</div></div>
+            <div class="advice-metric"><div class="am-label">Sleep</div><div class="am-value">${sleep}h</div></div>
+            <div class="advice-metric"><div class="am-label">Water</div><div class="am-value">${water} gl</div></div>
+            <div class="advice-metric"><div class="am-label">CEI</div><div class="am-value" style="color:${cei>=70?'#10b981':cei>=45?'#f59e0b':'#ef4444'}">${cei}</div></div>
+          </div>
+          <button class="btn-log-again" onclick="resetLogForm()">Log Another Day</button>
+        </div>
+      </div>`;
+  }, 700);
+});
+
+function resetLogForm() {
+  document.getElementById("log-form-container").style.display = "block";
+  document.getElementById("advice-container").style.display = "none";
+  document.getElementById("advice-container").innerHTML = "";
+  const btn = document.getElementById("btn-submit-log");
+  btn.disabled = false;
+  btn.innerHTML = `Submit &amp; Generate Insights <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
+}
+
+/* =====================
+   INIT
+   ===================== */
+renderDashboard();
+</script>
+</body>
+</html>
