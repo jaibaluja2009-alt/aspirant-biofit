@@ -1,4 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AspirantBioFit</title>
+</head>
+<body>
 
+    <div id="auth-screen" style="display: block; max-width: 360px; margin: 80px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; font-family: sans-serif;">
+        <h2 id="form-title" style="color: #333; margin-bottom: 20px;">Login to BioPulse</h2>
+        <input type="email" id="email" placeholder="Enter your email" style="width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+        <input type="password" id="password" placeholder="Enter your password" style="width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+        <button id="main-btn" onclick="handleAuth()" style="width: 100%; padding: 12px; background-color: #0070f3; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 12px;">Login</button>
+        <p id="toggle-link" onclick="toggleForm()" style="margin-top: 16px; font-size: 14px; color: #666; cursor: pointer;">Don't have an account? Sign Up</p>
+    </div>
+
+    <div id="dashboard-screen" style="display: none;">
+      
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -280,17 +298,6 @@
 </head>
 <body>
 
-    
-    <div id="auth-screen" style="display: block; max-width: 360px; margin: 80px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; font-family: sans-serif;">
-        <h2 id="form-title" style="color: #333; margin-bottom: 20px;">Login to BioPulse</h2>
-        <input type="email" id="email" placeholder="Enter your email" style="width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-        <input type="password" id="password" placeholder="Enter your password" style="width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-        <button id="main-btn" onclick="handleAuth()" style="width: 100%; padding: 12px; background-color: #0070f3; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 12px;">Login</button>
-        <p id="toggle-link" onclick="toggleForm()" style="margin-top: 16px; font-size: 14px; color: #666; cursor: pointer;">Don't have an account? Sign Up</p>
-    </div>
-
-   
-        <div id="dashboard-screen" style="display: none;">
 <!-- Sidebar -->
 <div id="sidebar">
   <div class="sidebar-brand">
@@ -876,10 +883,19 @@ function resetLogForm() {
 /* =====================
    INIT
    ===================== */
-</div> <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+renderDashboard();
+</script>
+</body>
+</html>
+
+        
+        </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
     <script>
+        // ⚠️ CRITICAL: Replace the API Key and App ID strings below with your real keys from Firebase settings!
         const firebaseConfig = {
             apiKey: "AIzaSyBQwfJcezlTQLeBDzStzSjULTpYqILNiag",
             authDomain: "aspirant-bio.firebaseapp.com",
@@ -889,10 +905,8 @@ function resetLogForm() {
             appId: "1:776820415980:web:966bae37c2e493c50db4c9"
         };
 
-        // Fire up Firebase Auth
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-
         let isLoginMode = true;
 
         function toggleForm() {
@@ -902,21 +916,18 @@ function resetLogForm() {
             document.getElementById('toggle-link').innerText = isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Login";
         }
 
-        // Automatic switcher tracking your user session state
         auth.onAuthStateChanged((user) => {
             const authScreen = document.getElementById('auth-screen');
             const dashScreen = document.getElementById('dashboard-screen');
             
             if (user) {
                 if (authScreen) authScreen.style.display = 'none';
-                if (dashScreen) dashScreen.style.display = 'block'; // Unlocks your full Replit tracking interface
-                
-                // Fire up your application layout render engine
+                if (dashScreen) dashScreen.style.display = 'block';
                 if (typeof renderDashboard === "function") {
                     renderDashboard();
                 }
             } else {
-                if (authScreen) authScreen.style.display = 'block'; // Keeps unauthorized traffic locked out
+                if (authScreen) authScreen.style.display = 'block';
                 if (dashScreen) dashScreen.style.display = 'none';
             }
         });
@@ -942,5 +953,3 @@ function resetLogForm() {
     </script>
 </body>
 </html>
-
-     
