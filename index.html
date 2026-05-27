@@ -26,9 +26,6 @@
 
     <div id="dashboard-screen" style="display: none;">
 
-        <!DOCTYPE html>
-<html lang="en">
-<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AspirantBioFit - Wellness Tracker</title>
@@ -381,8 +378,7 @@
       background-color: var(--muted);
     }
   </style>
-</head>
-<body>
+
   <div id="app" class="max-w-md mx-auto min-h-screen relative">
     <!-- Home Screen -->
     <div id="home-screen" class="screen active px-4 py-6">
@@ -576,7 +572,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Sleep Consistency</p>
-                <p id="sleep-insight-text" class="text-sm text-muted-foreground">Your sleep pattern shows good consistency. Keep maintaining 7-8 hours for optimal wellness.</p>
+                <p id="sleep-insight-text" class="text-sm text-muted-foreground">Analysing sleep patterns.</p>
               </div>
             </div>
           </div>
@@ -590,7 +586,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Mood Trends</p>
-                <p id="mood-insight-text" class="text-sm text-muted-foreground">Your mood has been mostly positive this week. Physical activity may help maintain this trend.</p>
+                <p id="mood-insight-text" class="text-sm text-muted-foreground">Analysing mood.</p>
               </div>
             </div>
           </div>
@@ -604,7 +600,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Study Balance</p>
-                <p id="study-insight-text" class="text-sm text-muted-foreground">You&apos;re averaging good study hours. Consider taking short breaks every 45 minutes.</p>
+                <p id="study-insight-text" class="text-sm text-muted-foreground">Analysing study hours.</p>
               </div>
             </div>
           </div>
@@ -617,7 +613,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Hydration Status</p>
-                <p class="text-sm text-muted-foreground">Great job staying hydrated! Aim for 8-10 glasses daily for optimal cognitive function.</p>
+                <p id="hydration-insight-text" class="text-sm text-muted-foreground">Analysing hydartion.</p>
               </div>
             </div>
           </div>
@@ -844,11 +840,11 @@
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Date</label>
-              <input type="date" id="entry-date" class="input">
+              <input type="date" id="entry-date" class="input" autocomplete="off">
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Sleep Hours</label>
-              <input type="number" id="entry-sleep" min="0" max="24" step="0.5" class="input" autocompleter="off">
+              <input type="number" id="entry-sleep" min="0" max="24" step="0.5" class="input" autocomplete="off">
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Study Hours</label>
@@ -856,7 +852,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Mood</label>
-              <select id="entry-mood" class="input">
+              <select id="entry-mood" class="input" autocomplete="off">
                 <option value="happy">😄 Happy</option>
                 <option value="good" selected>🙂 Good</option>
                 <option value="neutral">😐 Neutral</option>
@@ -1109,17 +1105,14 @@
       renderMoodChart();
     
     // ⬇️ ADD THIS CODE RIGHT HERE ⬇️
-    if (entries && entries.length > 0) {
-        const latestEntry = entries[entries.length - 1];
-        generateAIInsights(
-            latestEntry.sleepHours, 
-            latestEntry.studyHours, 
-            latestEntry.waterIntake, 
-            latestEntry.mood
-        );
-    }
-} // This is the original closing bracket on line 1110
- 
+    if (typeof generateAIInsights === "function") {
+  generateAIInsights(
+    latestEntry.sleepHours,
+    latestEntry.studyHours,
+    latestEntry.waterIntake,
+    latestEntry.mood
+  );
+}
 
     function renderSleepChart() {
       const chartContainer = document.getElementById('sleep-chart');
@@ -1333,10 +1326,10 @@
      
 // Change the opening line to a module script so it can use the modern importer
 </script> <script type="module">
-    import { GoogleGenAI } from "https://esm.run/@google/generative-ai";
+   import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
     window.generateAIInsights = async function(sleep, study, water, mood) {
-        const GEMINI_API_KEY = "AIzaSyBQwfJcez1TQLeBDzStzSjULtpYqILNiag";
+        const GEMINI_API_KEY = "AQ.Ab8RN6JDfss8D2wQujwtVvU915Tw5IPzAUURUhKtOYV0_Pa8YA";
         
         const moodCard = document.getElementById('mood-insight-text');
         const sleepCard = document.getElementById('sleep-insight-text');
@@ -1350,9 +1343,8 @@
 if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";     
 
         try {
-            const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-            // Using the ultra-fast gemini-1.5-flash model
-            const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+           const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
             const promptText = `You are a personalized student wellness coach. 
             Analyze today's metrics: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
@@ -1383,5 +1375,4 @@ if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";
     }
 
     </script>
-</body>
-</html>
+
