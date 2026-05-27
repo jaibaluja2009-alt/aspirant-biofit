@@ -1,7 +1,7 @@
 
 
 
- <div id="auth-screen" style="display: block;" class="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12 font-sans">
+ <div id="auth-screen" style="display: block; background: linear-gradient(135deg, #ccfbf1 0%, #dbeafe 45%, #fef3c7 100%);" class="min-h-screen flex items-center justify-center px-4 py-12 font-sans">
     <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-center">
         <div>
             <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
@@ -69,24 +69,24 @@
   </script>
   <style>
     :root {
-      --background: #f5fafa;
-      --foreground: #1a2e2e;
-      --card: #ffffff;
-      --card-foreground: #1a2e2e;
+            --background: #ecfeff;
+      --foreground: #123333;
+      --card: rgba(255, 255, 255, 0.78);
+      --card-foreground: #123333;
       --primary: #0d9488;
       --primary-foreground: #ffffff;
-      --secondary: #e6f2f2;
-      --secondary-foreground: #2d4a4a;
-      --muted: #e6f0f0;
-      --muted-foreground: #5a7a7a;
-      --accent: #3b82a8;
+      --secondary: rgba(204, 251, 241, 0.75);
+      --secondary-foreground: #164e63;
+      --muted: rgba(219, 234, 254, 0.75);
+      --muted-foreground: #52706f;
+      --accent: #2563eb;
       --accent-foreground: #ffffff;
       --destructive: #ef4444;
-      --border: #d1e0e0;
-      --input: #dce8e8;
+      --border: rgba(13, 148, 136, 0.18);
+      --input: rgba(255, 255, 255, 0.9);
       --ring: #0d9488;
       --chart-1: #0d9488;
-      --chart-2: #3b82a8;
+      --chart-2: #2563eb;
       --chart-3: #eab308;
       --chart-4: #22c55e;
       --chart-5: #0ea5e9;
@@ -121,16 +121,18 @@
       box-sizing: border-box;
     }
 
-    body {
+      body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--background);
+      background:
+        radial-gradient(circle at top left, rgba(20, 184, 166, 0.22), transparent 32%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 30%),
+        linear-gradient(135deg, #ecfeff 0%, #f0fdfa 45%, #eff6ff 100%);
       color: var(--foreground);
       margin: 0;
       padding: 0;
       min-height: 100vh;
       transition: background-color 0.3s, color 0.3s;
     }
-
     ::-webkit-scrollbar {
       width: 4px;
     }
@@ -152,13 +154,14 @@
     .screen.active {
       display: block;
     }
-
     .card {
-      background-color: var(--card);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: box-shadow 0.2s;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 28px rgba(13, 148, 136, 0.08);
+      transition: box-shadow 0.2s, transform 0.2s;
     }
 
     .card:hover {
@@ -1356,8 +1359,8 @@ if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";
           const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
          
-           const promptText = `
-You are an encouraging but realistic wellness coach for a student preparing for exams.
+                      const promptText = `
+You are a realistic but supportive wellness coach for a student preparing for exams.
 
 Today's data:
 Sleep: ${sleep} hours
@@ -1365,51 +1368,36 @@ Study: ${study} hours
 Water: ${water} glasses
 Mood: ${mood}
 
-Write 4 separate short insights:
-1. Sleep:
-2. Mood:
-3. Study:
-4. Hydration:
+Return ONLY valid JSON in this exact format:
+{
+  "sleep": "one specific human-sounding sleep insight under 20 words",
+  "mood": "one specific human-sounding mood insight under 20 words",
+  "study": "one specific human-sounding study insight under 20 words",
+  "hydration": "one specific human-sounding hydration insight under 20 words"
+}
 
-Each insight should be practical, specific, and sound human. Avoid generic lines like "keep it up". Keep each insight under 18 words.
+Do not use markdown. Do not add extra text.
 `;
 
             const result = await model.generateContent(promptText);
-            
-            const aiReply = result.response.text();
+            const rawReply = result.response.text().trim();
+            const cleanReply = rawReply.replace(/```json|```/g, "").trim();
+            const aiData = JSON.parse(cleanReply);
 
-            // 1. Put the custom AI response inside the Mood Trends card
-            if (moodCard) moodCard.innerText = aiReply;
+            if (sleepCard) sleepCard.innerText = aiData.sleep;
+            if (moodCard) moodCard.innerText = aiData.mood;
+            if (studyCard) studyCard.innerText = aiData.study;
+            if (hydrationCard) hydrationCard.innerText = aiData.hydration;
 
-            // 2. Instantly wipe out the old v0 placeholder text on the other cards!
-            if (sleepCard) {
-                sleepCard.innerText = `You slept ${sleep} hours. ${sleep < 7 ? 'This is low; aim for an earlier wind-down tonight.' : 'Great recovery! Your sleep consistency is stable.'}`;
-            }
-            if (studyCard) {
-                studyCard.innerText = `You logged ${study} hours of studying. ${study > 6 ? 'Intense focus! Take regular 10-minute breaks to keep your brain fresh.' : 'Steady pace. Remember to stretch between sessions.'}`;
-            }
-            if (hydrationCard) {
-                hydrationCard.innerText = `Tracked ${water} glasses of water. ${water < 8 ? 'Hydration is low. Drink a glass right now for mental clarity.' : 'Excellent hydration levels! Keep it up.'}`;
-            }
-
-            } catch (error) {
+                   } catch (error) {
             console.error("AI Error:", error);
 
-            if (moodCard) {
-                moodCard.innerText = "AI failed: " + (error.message || error);
-            }
+            const errorText = "AI error: " + (error.message || error);
 
-            if (sleepCard) {
-                sleepCard.innerText = `You slept ${sleep} hours. ${sleep < 7 ? 'Sleep is low; try sleeping earlier tonight.' : 'Sleep looks fine today.'}`;
-            }
-
-            if (studyCard) {
-                studyCard.innerText = `You studied ${study} hours. ${study > 6 ? 'Take short breaks to avoid burnout.' : 'Study balance looks okay.'}`;
-            }
-
-            if (hydrationCard) {
-                hydrationCard.innerText = `You drank ${water} glasses. ${water < 8 ? 'Drink more water today.' : 'Hydration looks good.'}`;
-            }
+            if (moodCard) moodCard.innerText = errorText;
+            if (sleepCard) sleepCard.innerText = "AI could not generate this insight.";
+            if (studyCard) studyCard.innerText = "AI could not generate this insight.";
+            if (hydrationCard) hydrationCard.innerText = "AI could not generate this insight.";
         }
     };
 </script>
