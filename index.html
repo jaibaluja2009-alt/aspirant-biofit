@@ -7,7 +7,7 @@
             <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
                 B
             </div>
-            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to BioPulse</h2>
+            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to AspirantBioFit</h2>
             <p class="mt-2 text-sm text-slate-500">Track your cognitive and physical wellness journey</p>
         </div>
         <div class="mt-8 space-y-4">
@@ -1277,52 +1277,46 @@
             messagingSenderId: "776820415980",
             appId: "1:776820415980:web:966bae37c2e493c50db4c9"
         };
+    
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        let isLoginMode = true;
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-        function toggleForm() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('form-title').innerText = isLoginMode ? "Login to BioPulse" : "Create BioPulse Account";
-            document.getElementById('main-btn').innerText = isLoginMode ? "Login" : "Sign Up";
-            document.getElementById('toggle-link').innerText = isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Login";
+    // 1. Force the app to remember the user forever
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .catch((error) => {
+          console.error("Persistence error:", error);
+      });
+
+    // 2. Your login / signup function
+    window.handleAuth = function() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        if(!email || !password) return alert('Please fill in all fields');
+
+        if(typeof isSignUp !== 'undefined' && isSignUp) {
+            auth.createUserWithEmailAndPassword(email, password).catch(err => alert(err.message));
+        } else {
+            auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
         }
+    }
 
-        auth.onAuthStateChanged((user) => {
-            const authScreen = document.getElementById('auth-screen');
-            const dashScreen = document.getElementById('dashboard-screen');
-            
-            if (user) {
-                if (authScreen) authScreen.style.display = 'none';
-                if (dashScreen) dashScreen.style.display = 'block';
-                if (typeof renderDashboard === "function") {
-                    renderDashboard();
-                }
-            } else {
-                if (authScreen) authScreen.style.display = 'block';
-                if (dashScreen) dashScreen.style.display = 'none';
-            }
-        });
+    // 3. Automatically skip the login screen if already logged in
+    auth.onAuthStateChanged((user) => {
+        const authScreen = document.getElementById('auth-screen');
+        const dashScreen = document.getElementById('dashboard-screen');
 
-        function handleAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                alert('Please fill out all fields.');
-                return;
-            }
-
-            if (isLoginMode) {
-                auth.signInWithEmailAndPassword(email, password)
-                    .catch((error) => { alert(error.message); });
-            } else {
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then(() => { alert('Account Created Successfully!'); })
-                    .catch((error) => { alert(error.message); });
-            }
+        if (user) {
+            if (authScreen) authScreen.style.display = 'none';
+            if (dashScreen) dashScreen.style.display = 'block';
+        } else {
+            if (authScreen) authScreen.style.display = 'block';
+            if (dashScreen) dashScreen.style.display = 'none';
         }
+    });
+     
+
     </script>
 </body>
 </html>
