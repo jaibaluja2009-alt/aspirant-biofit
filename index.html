@@ -1359,7 +1359,7 @@ if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";
           const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
          
-                      const promptText = `
+                  const promptText = `
 You are a realistic but supportive wellness coach for a student preparing for exams.
 
 Today's data:
@@ -1368,37 +1368,42 @@ Study: ${study} hours
 Water: ${water} glasses
 Mood: ${mood}
 
-Return ONLY valid JSON in this exact format:
-{
-  "sleep": "one specific human-sounding sleep insight under 20 words",
-  "mood": "one specific human-sounding mood insight under 20 words",
-  "study": "one specific human-sounding study insight under 20 words",
-  "hydration": "one specific human-sounding hydration insight under 20 words"
-}
+Write exactly 4 lines in this format:
+Sleep: short specific sleep insight
+Mood: short specific mood insight
+Study: short specific study insight
+Hydration: short specific hydration insight
 
-Do not use markdown. Do not add extra text.
+Rules:
+- Keep each line under 18 words.
+- No markdown.
+- No bullets.
+- No extra introduction.
 `;
 
-            const result = await model.generateContent(promptText);
-            const rawReply = result.response.text().trim();
-            const cleanReply = rawReply.replace(/```json|```/g, "").trim();
-            const aiData = JSON.parse(cleanReply);
+const result = await model.generateContent(promptText);
+const aiReply = result.response.text().trim();
 
-            if (sleepCard) sleepCard.innerText = aiData.sleep;
-            if (moodCard) moodCard.innerText = aiData.mood;
-            if (studyCard) studyCard.innerText = aiData.study;
-            if (hydrationCard) hydrationCard.innerText = aiData.hydration;
+const sleepLine = aiReply.match(/Sleep:\s*(.*)/i);
+const moodLine = aiReply.match(/Mood:\s*(.*)/i);
+const studyLine = aiReply.match(/Study:\s*(.*)/i);
+const hydrationLine = aiReply.match(/Hydration:\s*(.*)/i);
 
-                   } catch (error) {
-            console.error("AI Error:", error);
+if (sleepCard) sleepCard.innerText = sleepLine ? sleepLine[1].trim() : aiReply;
+if (moodCard) moodCard.innerText = moodLine ? moodLine[1].trim() : aiReply;
+if (studyCard) studyCard.innerText = studyLine ? studyLine[1].trim() : aiReply;
+if (hydrationCard) hydrationCard.innerText = hydrationLine ? hydrationLine[1].trim() : aiReply;
 
-            const errorText = "AI error: " + (error.message || error);
+         } catch (error) {
+    console.error("AI Error:", error);
 
-            if (moodCard) moodCard.innerText = errorText;
-            if (sleepCard) sleepCard.innerText = "AI could not generate this insight.";
-            if (studyCard) studyCard.innerText = "AI could not generate this insight.";
-            if (hydrationCard) hydrationCard.innerText = "AI could not generate this insight.";
-        }
+    const errorText = "AI error: " + (error.message || error);
+
+    if (moodCard) moodCard.innerText = errorText;
+    if (sleepCard) sleepCard.innerText = errorText;
+    if (studyCard) studyCard.innerText = errorText;
+    if (hydrationCard) hydrationCard.innerText = errorText;
+}
     };
     
 </script>
