@@ -604,7 +604,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Study Balance</p>
-                <p class="text-sm text-muted-foreground">You&apos;re averaging good study hours. Consider taking short breaks every 45 minutes.</p>
+                <p id="study-insight-text" class="text-sm text-muted-foreground">You&apos;re averaging good study hours. Consider taking short breaks every 45 minutes.</p>
               </div>
             </div>
           </div>
@@ -1297,6 +1297,15 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    }
+  }
+</script>
+
     // 1. Force the app to remember the user forever
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .catch((error) => {
@@ -1329,42 +1338,57 @@
             if (dashScreen) dashScreen.style.display = 'none';
         }
     });
-   async function generateAIInsights(sleep, study, water, mood) {
-    const GEMINI_API_KEY = "AIzaSyCqa4u3YwIwzMApwa90fh9QKU1l5Tk6BsE"; // 🔑 Your real key from your photo!
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+     
+// Change the opening line to a module script so it can use the modern importer
+</script> <script type="module">
+    import { GoogleGenAI } from "https://esm.run/@google/generative-ai";
 
-    const moodParagraph = document.getElementById('mood-insight-text');
-    if (!moodParagraph) return;
-
-    moodParagraph.innerText = "🧠 AI Coach is analyzing your day...";
-
-    const promptText = `You are a personalized, highly encouraging student wellness coach. 
-    Analyze today's metrics: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
-    Provide a highly actionable, 2-sentence summary offering one piece of advice for physical recovery and one for mental focus. 
-    Do not use formatting, markdown, asterisks, or bullet points. Keep it under 40 words total.`;
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
-            })
-        });
-
-        const data = await response.json();
-        const aiReply = data.candidates[0].content.parts[0].text;
-
-        moodParagraph.innerText = aiReply;
+    window.generateAIInsights = async function(sleep, study, water, mood) {
+        const GEMINI_API_KEY = "AIzaSyBQwfJcez1TQLeBDzStzSjULtpYqILNiag";
         
-        const sleepParagraph = document.getElementById('sleep-insight-text');
-        if (sleepParagraph) sleepParagraph.innerText = "Live AI tracking active.";
-        
-    } catch (error) {
-        console.error("AI Error:", error);
-        moodParagraph.innerText = "Couldn't reach your AI coach. Check your connection!";
+        const moodCard = document.getElementById('mood-insight-text');
+        const sleepCard = document.getElementById('sleep-insight-text');
+        const studyCard = document.getElementById('study-insight-text');
+        const hydrationCard = document.getElementById('hydration-insight-text');
+
+        // Set all cards to a loading state so the user knows the AI is working
+        if (moodCard) moodCard.innerText = "🧠 AI Coach is analyzing your mood...";
+        if (sleepCard) sleepCard.innerText = "⚡ Analyzing patterns...";
+        if (studyCard) studyCard.innerText = "📚 Checking balance...";
+if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";     
+
+        try {
+            const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+            // Using the ultra-fast gemini-1.5-flash model
+            const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+            const promptText = `You are a personalized student wellness coach. 
+            Analyze today's metrics: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
+            Provide a short, direct, 2-sentence piece of advice. Do not use formatting, markdown, or asterisks. Keep it under 40 words.`;
+
+            const result = await model.generateContent(promptText);
+            const response = await result.response;
+            const aiReply = response.text();
+
+            // 1. Put the custom AI response inside the Mood Trends card
+            if (moodCard) moodCard.innerText = aiReply;
+
+            // 2. Instantly wipe out the old v0 placeholder text on the other cards!
+            if (sleepCard) {
+                sleepCard.innerText = `You slept ${sleep} hours. ${sleep < 7 ? 'This is low; aim for an earlier wind-down tonight.' : 'Great recovery! Your sleep consistency is stable.'}`;
+            }
+            if (studyCard) {
+                studyCard.innerText = `You logged ${study} hours of studying. ${study > 6 ? 'Intense focus! Take regular 10-minute breaks to keep your brain fresh.' : 'Steady pace. Remember to stretch between sessions.'}`;
+            }
+            if (hydrationCard) {
+                hydrationCard.innerText = `Tracked ${water} glasses of water. ${water < 8 ? 'Hydration is low. Drink a glass right now for mental clarity.' : 'Excellent hydration levels! Keep it up.'}`;
+            }
+
+        } catch (error) {
+            console.error("AI Error:", error);
+            if (moodCard) moodCard.innerText = "AI Coach is resting. The rules-based engine is keeping track of your stats!";
+        }
     }
-}
 
     </script>
 </body>
