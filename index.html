@@ -1297,15 +1297,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script type="importmap">
-  {
-    "imports": {
-      "@google/generative-ai": "https://esm.run/@google/generative-ai"
-    }
-  }
-</script>
-
+    
     // 1. Force the app to remember the user forever
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .catch((error) => {
