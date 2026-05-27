@@ -1354,11 +1354,25 @@ if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";
 
         try {
           const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
          
-            const promptText = `You are a personalized student wellness coach. 
-            Analyze today's metrics: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
-            Provide a short, direct, 2-sentence piece of advice. Do not use formatting, markdown, or asterisks. Keep it under 40 words.`;
+           const promptText = `
+You are an encouraging but realistic wellness coach for a student preparing for exams.
+
+Today's data:
+Sleep: ${sleep} hours
+Study: ${study} hours
+Water: ${water} glasses
+Mood: ${mood}
+
+Write 4 separate short insights:
+1. Sleep:
+2. Mood:
+3. Study:
+4. Hydration:
+
+Each insight should be practical, specific, and sound human. Avoid generic lines like "keep it up". Keep each insight under 18 words.
+`;
 
             const result = await model.generateContent(promptText);
             
