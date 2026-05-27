@@ -1103,17 +1103,19 @@
 
       renderSleepChart();
       renderMoodChart();
-    
-    // ⬇️ ADD THIS CODE RIGHT HERE ⬇️
-    if (typeof generateAIInsights === "function") {
-  generateAIInsights(
-    latestEntry.sleepHours,
-    latestEntry.studyHours,
-    latestEntry.waterIntake,
-    latestEntry.mood
-  );
-}
+          if (entries.length > 0 && typeof generateAIInsights === "function") {
+        const latestEntry = entries[entries.length - 1];
 
+        generateAIInsights(
+          latestEntry.sleepHours,
+          latestEntry.studyHours,
+          latestEntry.waterIntake,
+          latestEntry.mood
+        );
+      }
+    }
+
+    
     function renderSleepChart() {
       const chartContainer = document.getElementById('sleep-chart');
       const last7Days = [];
@@ -1263,8 +1265,7 @@
       if (e.target === this) closeModal();
     });
   </script>
-</body>
-</html>
+
 
       
 
@@ -1325,11 +1326,12 @@
     });
      
 // Change the opening line to a module script so it can use the modern importer
-</script> <script type="module">
+</script> 
+<script type="module">
    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
     window.generateAIInsights = async function(sleep, study, water, mood) {
-        const GEMINI_API_KEY = "AQ.Ab8RN6JDfss8D2wQujwtVvU915Tw5IPzAUURUhKtOYV0_Pa8YA";
+        const GEMINI_API_KEY = "AQ.Ab8RN6J6X4KDaLbG-TdzLH1mciZGNaBYOdAzvGS-aZZDiTSo9Q";
         
         const moodCard = document.getElementById('mood-insight-text');
         const sleepCard = document.getElementById('sleep-insight-text');
@@ -1375,4 +1377,6 @@ const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
     }
 
     </script>
+</body>
+</html>
 
