@@ -976,7 +976,7 @@
         entries.push(entry);
       }
      // Trigger the real AI coach update using your exact variables from lines 967-970
-    generateAIInsights(entry.sleepHours, entry.studyHours, entry.waterIntake, entry.mood);
+   
 
       localStorage.setItem('wellnessEntries', JSON.stringify(entries));
       closeModal();
@@ -1107,7 +1107,19 @@
 
       renderSleepChart();
       renderMoodChart();
+    
+    // ⬇️ ADD THIS CODE RIGHT HERE ⬇️
+    if (entries && entries.length > 0) {
+        const latestEntry = entries[entries.length - 1];
+        generateAIInsights(
+            latestEntry.sleepHours, 
+            latestEntry.studyHours, 
+            latestEntry.waterIntake, 
+            latestEntry.mood
+        );
     }
+} // This is the original closing bracket on line 1110
+ 
 
     function renderSleepChart() {
       const chartContainer = document.getElementById('sleep-chart');
@@ -1317,21 +1329,19 @@
             if (dashScreen) dashScreen.style.display = 'none';
         }
     });
-     
-     async function generateAIInsights(sleep, study, water, mood) {
-    // 1. Paste your real Gemini API key right here
-    const GEMINI_API_KEY = "AIzaSyCqa4u3YwIwzMApwa90fh9QKU1l5Tk6BsE"; 
+   async function generateAIInsights(sleep, study, water, mood) {
+    const GEMINI_API_KEY = "AIzaSyCqa4u3YwIwzMApwa90fh9QKU1l5Tk6BsE"; // 🔑 Your real key from your photo!
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-    // 2. Put a temporary loading message on the screen so the user knows the AI is thinking
-    document.getElementById('mood-insight-text').innerText = "🧠 AI is analyzing your day...";
-    document.getElementById('sleep-insight-text').innerText = "⚡ Thinking...";
+    const moodParagraph = document.getElementById('mood-insight-text');
+    if (!moodParagraph) return;
 
-    // 3. Craft the exact instructions for the AI
+    moodParagraph.innerText = "🧠 AI Coach is analyzing your day...";
+
     const promptText = `You are a personalized, highly encouraging student wellness coach. 
-    Analyze today's data: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
+    Analyze today's metrics: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
     Provide a highly actionable, 2-sentence summary offering one piece of advice for physical recovery and one for mental focus. 
-    Do not use formatting, markdown, or bullet points. Keep it under 50 words total.`;
+    Do not use formatting, markdown, asterisks, or bullet points. Keep it under 40 words total.`;
 
     try {
         const response = await fetch(url, {
@@ -1345,16 +1355,16 @@
         const data = await response.json();
         const aiReply = data.candidates[0].content.parts[0].text;
 
-        // 4. Inject the real AI response directly into your dashboard card!
-        document.getElementById('mood-insight-text').innerText = aiReply;
-        document.getElementById('sleep-insight-text').innerText = "Updated live based on your data.";
+        moodParagraph.innerText = aiReply;
+        
+        const sleepParagraph = document.getElementById('sleep-insight-text');
+        if (sleepParagraph) sleepParagraph.innerText = "Live AI tracking active.";
         
     } catch (error) {
         console.error("AI Error:", error);
-        document.getElementById('mood-insight-text').innerText = "Could not reach the AI coach right now. Check your internet connection!";
+        moodParagraph.innerText = "Couldn't reach your AI coach. Check your connection!";
     }
 }
-     
 
     </script>
 </body>
