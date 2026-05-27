@@ -576,7 +576,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Sleep Consistency</p>
-                <p class="text-sm text-muted-foreground">Your sleep pattern shows good consistency. Keep maintaining 7-8 hours for optimal wellness.</p>
+                <p id="sleep-insight-text" class="text-sm text-muted-foreground">Your sleep pattern shows good consistency. Keep maintaining 7-8 hours for optimal wellness.</p>
               </div>
             </div>
           </div>
@@ -590,7 +590,7 @@
               </div>
               <div>
                 <p class="font-medium text-foreground">Mood Trends</p>
-                <p class="text-sm text-muted-foreground">Your mood has been mostly positive this week. Physical activity may help maintain this trend.</p>
+                <p id="mood-insight-text" class="text-sm text-muted-foreground">Your mood has been mostly positive this week. Physical activity may help maintain this trend.</p>
               </div>
             </div>
           </div>
@@ -975,6 +975,8 @@
       } else {
         entries.push(entry);
       }
+     // Trigger the real AI coach update using your exact variables from lines 967-970
+    generateAIInsights(entry.sleepHours, entry.studyHours, entry.waterIntake, entry.mood);
 
       localStorage.setItem('wellnessEntries', JSON.stringify(entries));
       closeModal();
@@ -1315,6 +1317,43 @@
             if (dashScreen) dashScreen.style.display = 'none';
         }
     });
+     
+     async function generateAIInsights(sleep, study, water, mood) {
+    // 1. Paste your real Gemini API key right here
+    const GEMINI_API_KEY = "AIzaSyCqa4u3YwIwzMApwa90fh9QKU1l5Tk6BsE"; 
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+    // 2. Put a temporary loading message on the screen so the user knows the AI is thinking
+    document.getElementById('mood-insight-text').innerText = "🧠 AI is analyzing your day...";
+    document.getElementById('sleep-insight-text').innerText = "⚡ Thinking...";
+
+    // 3. Craft the exact instructions for the AI
+    const promptText = `You are a personalized, highly encouraging student wellness coach. 
+    Analyze today's data: Sleep: ${sleep} hours, Study: ${study} hours, Water: ${water} glasses, Mood: ${mood}.
+    Provide a highly actionable, 2-sentence summary offering one piece of advice for physical recovery and one for mental focus. 
+    Do not use formatting, markdown, or bullet points. Keep it under 50 words total.`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }]
+            })
+        });
+
+        const data = await response.json();
+        const aiReply = data.candidates[0].content.parts[0].text;
+
+        // 4. Inject the real AI response directly into your dashboard card!
+        document.getElementById('mood-insight-text').innerText = aiReply;
+        document.getElementById('sleep-insight-text').innerText = "Updated live based on your data.";
+        
+    } catch (error) {
+        console.error("AI Error:", error);
+        document.getElementById('mood-insight-text').innerText = "Could not reach the AI coach right now. Check your internet connection!";
+    }
+}
      
 
     </script>
