@@ -1,13 +1,28 @@
 
 
 
-    <div id="auth-screen" style="display: block; max-width: 360px; margin: 80px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; font-family: sans-serif;">
-        <h2 id="form-title" style="color: #333; margin-bottom: 20px;">Login to BioPulse</h2>
-        <input type="email" id="email" placeholder="Enter your email" style="width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-        <input type="password" id="password" placeholder="Enter your password" style="width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-        <button id="main-btn" onclick="handleAuth()" style="width: 100%; padding: 12px; background-color: #0070f3; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 12px;">Login</button>
-        <p id="toggle-link" onclick="toggleForm()" style="margin-top: 16px; font-size: 14px; color: #666; cursor: pointer;">Don't have an account? Sign Up</p>
+ <div id="auth-screen" style="display: block;" class="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12 font-sans">
+    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-center">
+        <div>
+            <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
+                B
+            </div>
+            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to BioPulse</h2>
+            <p class="mt-2 text-sm text-slate-500">Track your cognitive and physical wellness journey</p>
+        </div>
+        <div class="mt-8 space-y-4">
+            <input type="email" id="email" placeholder="Enter your email" class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-sm bg-slate-50/50">
+            <input type="password" id="password" placeholder="Enter your password" class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-sm bg-slate-50/50">
+            
+            <button id="main-btn" onclick="handleAuth()" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
+                Login
+            </button>
+        </div>
+        <p id="toggle-link" onclick="toggleForm()" class="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium cursor-pointer transition-colors">
+            Don't have an account? Sign Up
+        </p>
     </div>
+</div>
 
     <div id="dashboard-screen" style="display: none;">
 
@@ -833,11 +848,11 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Sleep Hours</label>
-              <input type="number" id="entry-sleep" min="0" max="24" step="0.5" class="input" placeholder="7">
+              <input type="number" id="entry-sleep" min="0" max="24" step="0.5" class="input" autocompleter="off">
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Study Hours</label>
-              <input type="number" id="entry-study" min="0" max="24" step="0.5" class="input" placeholder="4">
+              <input type="number" id="entry-study" min="0" max="24" step="0.5" class="input" autocomplete="off">
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Mood</label>
@@ -851,7 +866,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Water Intake (glasses)</label>
-              <input type="number" id="entry-water" min="0" max="20" class="input" placeholder="8">
+              <input type="number" id="entry-water" min="0" max="20" class="input" autocomplete="off">
             </div>
             <button onclick="saveEntry()" class="btn btn-primary w-full py-2.5 mt-2" id="save-btn">Add Entry</button>
           </div>
