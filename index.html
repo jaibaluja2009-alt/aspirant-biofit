@@ -951,10 +951,18 @@
       editingId = null;
     }
 
-    function setDefaultDate() {
-      document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
-    }
+    function getTodayLocalDate() {
+  const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  return today.toISOString().split('T')[0];
+}
 
+function setDefaultDate() {
+  const dateInput = document.getElementById('entry-date');
+  if (dateInput) {
+    dateInput.value = getTodayLocalDate();
+  }
+}
     // Entry CRUD
     function saveEntry() {
       const entry = {
@@ -1353,8 +1361,8 @@ const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
             Provide a short, direct, 2-sentence piece of advice. Do not use formatting, markdown, or asterisks. Keep it under 40 words.`;
 
             const result = await model.generateContent(promptText);
-            const response = await result.response;
-            const aiReply = response.text();
+            
+            const aiReply = result.response.text();
 
             // 1. Put the custom AI response inside the Mood Trends card
             if (moodCard) moodCard.innerText = aiReply;
@@ -1371,11 +1379,24 @@ const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
             }
 
         } catch (error) {
-            console.error("AI Error:", error);
-            if (moodCard) moodCard.innerText = "AI Coach is resting. The rules-based engine is keeping track of your stats!";
-        }
+    console.error("AI Error:", error);
+
+    if (moodCard) {
+        moodCard.innerText = "AI failed: " + (error.message || error);
     }
 
+    if (sleepCard) {
+        sleepCard.innerText = `You slept ${sleep} hours. ${sleep < 7 ? 'Sleep is low; try sleeping earlier tonight.' : 'Sleep looks fine today.'}`;
+    }
+
+    if (studyCard) {
+        studyCard.innerText = `You studied ${study} hours. ${study > 6 ? 'Take short breaks to avoid burnout.' : 'Study balance looks okay.'}`;
+    }
+
+    if (hydrationCard) {
+        hydrationCard.innerText = `You drank ${water} glasses. ${water < 8 ? 'Drink more water today.' : 'Hydration looks good.'}`;
+    }
+}
     </script>
 </body>
 </html>
