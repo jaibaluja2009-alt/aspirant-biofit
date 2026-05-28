@@ -1377,31 +1377,30 @@ window.handleAuth = function() {
     }
 };
 
-// 4. Google login using redirect
+// 4. Google login using popup
 window.loginWithGoogle = function() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         .then(() => {
-            return auth.signInWithRedirect(provider);
+            return auth.signInWithPopup(provider);
+        })
+        .then((result) => {
+            if (result && result.user) {
+                console.log("Google login successful:", result.user.email);
+
+                const authScreen = document.getElementById("auth-screen");
+                const dashScreen = document.getElementById("dashboard-screen");
+
+                if (authScreen) authScreen.style.display = "none";
+                if (dashScreen) dashScreen.style.display = "block";
+            }
         })
         .catch((error) => {
-            console.error("Google redirect start error:", error);
+            console.error("Google popup login error:", error);
             alert(error.message);
         });
 };
-
-// 5. Read Google redirect result after returning to app
-auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            console.log("Google login successful:", result.user.email);
-        }
-    })
-    .catch((error) => {
-        console.error("Google redirect result error:", error);
-        alert(error.message);
-    });
 
 window.logoutUser = function() {
     auth.signOut()
