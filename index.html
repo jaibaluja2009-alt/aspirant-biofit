@@ -1377,9 +1377,20 @@ window.handleAuth = function() {
     }
 };
 
+let googleLoginInProgress = false;
+
 // 4. Google login using popup
 window.loginWithGoogle = function() {
+    if (googleLoginInProgress) {
+        return;
+    }
+
+    googleLoginInProgress = true;
+
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({
+        prompt: "select_account"
+    });
 
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         .then(() => {
@@ -1398,7 +1409,13 @@ window.loginWithGoogle = function() {
         })
         .catch((error) => {
             console.error("Google popup login error:", error);
-            alert(error.message);
+
+            if (error.code !== "auth/cancelled-popup-request") {
+                alert(error.message);
+            }
+        })
+        .finally(() => {
+            googleLoginInProgress = false;
         });
 };
 
