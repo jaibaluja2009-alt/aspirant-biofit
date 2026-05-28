@@ -1362,12 +1362,36 @@ window.handleAuth = function() {
 window.loginWithGoogle = function() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    auth.signInWithPopup(provider)
+    auth.signInWithRedirect(provider)
         .catch((error) => {
-            console.error("Google login error:", error);
+            console.error("Google redirect start error:", error);
             alert(error.message);
         });
 };
+
+     auth.getRedirectResult()
+    .then((result) => {
+        if (result.user) {
+            console.log("Google login successful:", result.user.email);
+        }
+    })
+    .catch((error) => {
+        console.error("Google redirect result error:", error);
+        alert(error.message);
+    });
+
+     auth.onAuthStateChanged((user) => {
+    const authScreen = document.getElementById("auth-screen");
+    const dashScreen = document.getElementById("dashboard-screen");
+
+    if (user) {
+        if (authScreen) authScreen.style.display = "none";
+        if (dashScreen) dashScreen.style.display = "block";
+    } else {
+        if (authScreen) authScreen.style.display = "block";
+        if (dashScreen) dashScreen.style.display = "none";
+    }
+});
      
 // Change the opening line to a module script so it can use the modern importer
 </script> 
