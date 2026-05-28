@@ -1319,9 +1319,14 @@ function setDefaultDate() {
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+// 1. Keep user logged in after refresh
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error) => {
+        console.error("Persistence error:", error);
+    });
 
-    
-  let isSignUp = false;
+// 2. Login / Sign Up toggle
+let isSignUp = false;
 
 window.toggleForm = function() {
     isSignUp = !isSignUp;
@@ -1331,19 +1336,23 @@ window.toggleForm = function() {
     const toggleLink = document.getElementById("toggle-link");
 
     if (isSignUp) {
-        title.textContent = "Create your AspirantBioFit account";
-        mainBtn.textContent = "Sign Up";
-        toggleLink.textContent = "Already have an account? Login";
+        if (title) title.textContent = "Create your AspirantBioFit account";
+        if (mainBtn) mainBtn.textContent = "Sign Up";
+        if (toggleLink) toggleLink.textContent = "Already have an account? Login";
     } else {
-        title.textContent = "Welcome to AspirantBioFit";
-        mainBtn.textContent = "Login";
-        toggleLink.textContent = "Don't have an account? Sign Up";
+        if (title) title.textContent = "Welcome to AspirantBioFit";
+        if (mainBtn) mainBtn.textContent = "Login";
+        if (toggleLink) toggleLink.textContent = "Don't have an account? Sign Up";
     }
 };
 
+// 3. Email/password login and signup
 window.handleAuth = function() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+
+    const email = emailInput ? emailInput.value.trim() : "";
+    const password = passwordInput ? passwordInput.value : "";
 
     if (!email || !password) {
         alert("Please fill in all fields");
@@ -1352,13 +1361,20 @@ window.handleAuth = function() {
 
     if (isSignUp) {
         auth.createUserWithEmailAndPassword(email, password)
-            .catch((err) => alert(err.message));
+            .catch((error) => {
+                console.error("Sign up error:", error);
+                alert(error.message);
+            });
     } else {
         auth.signInWithEmailAndPassword(email, password)
-            .catch((err) => alert(err.message));
+            .catch((error) => {
+                console.error("Login error:", error);
+                alert(error.message);
+            });
     }
 };
 
+// 4. Google login using redirect
 window.loginWithGoogle = function() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -1369,9 +1385,10 @@ window.loginWithGoogle = function() {
         });
 };
 
-     auth.getRedirectResult()
+// 5. Read Google redirect result after returning to app
+auth.getRedirectResult()
     .then((result) => {
-        if (result.user) {
+        if (result && result.user) {
             console.log("Google login successful:", result.user.email);
         }
     })
@@ -1380,7 +1397,8 @@ window.loginWithGoogle = function() {
         alert(error.message);
     });
 
-     auth.onAuthStateChanged((user) => {
+// 6. Show dashboard when logged in
+auth.onAuthStateChanged((user) => {
     const authScreen = document.getElementById("auth-screen");
     const dashScreen = document.getElementById("dashboard-screen");
 
@@ -1392,7 +1410,8 @@ window.loginWithGoogle = function() {
         if (dashScreen) dashScreen.style.display = "none";
     }
 });
-     
+    
+
 // Change the opening line to a module script so it can use the modern importer
 </script> 
 <script>
