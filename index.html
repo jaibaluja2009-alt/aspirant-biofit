@@ -894,10 +894,14 @@ let entries = [];
 }
 
 function loadUserEntries() {
+  localStorage.removeItem("wellnessEntries");
+  localStorage.removeItem("lastAIKey");
+  localStorage.removeItem("lastAIText");
+
   const key = getEntriesStorageKey();
   entries = key ? JSON.parse(localStorage.getItem(key) || "[]") : [];
 }
-
+   
 function saveUserEntries() {
   const key = getEntriesStorageKey();
   if (key) {
@@ -1442,8 +1446,13 @@ window.logoutUser = function() {
             currentUserId = null;
             entries = [];
 
+            localStorage.removeItem("wellnessEntries");
             localStorage.removeItem("lastAIKey");
             localStorage.removeItem("lastAIText");
+
+            renderEntries();
+            updateInsights();
+            updateProfile();
 
             console.log("User logged out");
         })
