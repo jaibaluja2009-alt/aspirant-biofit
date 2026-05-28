@@ -1381,7 +1381,10 @@ window.handleAuth = function() {
 window.loginWithGoogle = function() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    auth.signInWithRedirect(provider)
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            return auth.signInWithRedirect(provider);
+        })
         .catch((error) => {
             console.error("Google redirect start error:", error);
             alert(error.message);
@@ -1405,6 +1408,12 @@ auth.getRedirectResult()
     .then((result) => {
         if (result && result.user) {
             console.log("Google login successful:", result.user.email);
+
+            const authScreen = document.getElementById("auth-screen");
+            const dashScreen = document.getElementById("dashboard-screen");
+
+            if (authScreen) authScreen.style.display = "none";
+            if (dashScreen) dashScreen.style.display = "block";
         }
     })
     .catch((error) => {
