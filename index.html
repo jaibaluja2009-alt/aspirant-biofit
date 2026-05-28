@@ -1408,25 +1408,16 @@ if (moodCard) moodCard.innerText = moodLine ? moodLine[1].trim() : aiReply;
 if (studyCard) studyCard.innerText = studyLine ? studyLine[1].trim() : aiReply;
 if (hydrationCard) hydrationCard.innerText = hydrationLine ? hydrationLine[1].trim() : aiReply;
 
-         } catch (error) {
-    console.error("AI Error:", error);
+                } catch (error) {
+            console.error("AI Error:", error);
 
-  console.error("AI Error:", error);
+            const errorText = "AI insights are temporarily unavailable. Please try again later.";
 
-const errorText = "AI insights are temporarily unavailable. Please try again later.";
-
-const aiText = {
-  sleep: sleepLine ? sleepLine[1].trim() : aiReply,
-  mood: moodLine ? moodLine[1].trim() : aiReply,
-  study: studyLine ? studyLine[1].trim() : aiReply,
-  hydration: hydrationLine ? hydrationLine[1].trim() : aiReply
-};
-
-if (sleepCard) sleepCard.innerText = aiText.sleep;
-if (moodCard) moodCard.innerText = aiText.mood;
-if (studyCard) studyCard.innerText = aiText.study;
-if (hydrationCard) hydrationCard.innerText = aiText.hydration;
-
+            if (sleepCard) sleepCard.innerText = errorText;
+            if (moodCard) moodCard.innerText = errorText;
+            if (studyCard) studyCard.innerText = errorText;
+            if (hydrationCard) hydrationCard.innerText = errorText;
+        }
 localStorage.setItem("lastAIText", JSON.stringify(aiText));
 }
     };
