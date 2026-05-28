@@ -1458,52 +1458,6 @@ window.loginWithGoogle = function() {
         });
 };
 
-  
-
-    auth.signOut()
-        .then(() => {
-            currentUserId = null;
-            entries = [];
-
-            localStorage.removeItem("lastAIKey");
-            localStorage.removeItem("lastAIText");
-
-            return auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        })
-        .then(() => {
-            return auth.signInWithPopup(provider);
-        })
-        .then((result) => {
-            if (result && result.user) {
-                console.log("Switched to:", result.user.email);
-
-                currentUserId = result.user.uid;
-                loadUserEntries();
-
-                const loggedInEmail = document.getElementById("logged-in-email");
-                if (loggedInEmail) {
-                    loggedInEmail.textContent = result.user.email || "Google account";
-                }
-
-                renderEntries();
-                updateInsights();
-                updateProfile();
-
-                const authScreen = document.getElementById("auth-screen");
-                const dashScreen = document.getElementById("dashboard-screen");
-
-                if (authScreen) authScreen.style.display = "none";
-                if (dashScreen) dashScreen.style.display = "block";
-            }
-        })
-        .catch((error) => {
-            console.error("Switch account error:", error);
-
-            if (error.code !== "auth/cancelled-popup-request") {
-                alert(error.message);
-            }
-        });
-};
 window.switchGoogleAccount = function() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
