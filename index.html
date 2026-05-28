@@ -883,10 +883,27 @@
 
   <script>
     // State
-    let entries = JSON.parse(localStorage.getItem('wellnessEntries')) || [];
+   let currentUserId = null;
+let entries = [];
     let editingId = null;
     let notifications = localStorage.getItem('notifications') !== 'false';
     let isDark = localStorage.getItem('theme') === 'dark';
+
+   function getEntriesStorageKey() {
+  return currentUserId ? `wellnessEntries_${currentUserId}` : null;
+}
+
+function loadUserEntries() {
+  const key = getEntriesStorageKey();
+  entries = key ? JSON.parse(localStorage.getItem(key) || "[]") : [];
+}
+
+function saveUserEntries() {
+  const key = getEntriesStorageKey();
+  if (key) {
+    localStorage.setItem(key, JSON.stringify(entries));
+  }
+}
 
     const moodEmojis = { happy: '😄', good: '🙂', neutral: '😐', sad: '😢', stressed: '😰' };
     const moodLabels = { happy: 'Happy', good: 'Good', neutral: 'Neutral', sad: 'Sad', stressed: 'Stressed' };
@@ -992,7 +1009,7 @@ function setDefaultDate() {
      // Trigger the real AI coach update using your exact variables from lines 967-970
    
 
-      localStorage.setItem('wellnessEntries', JSON.stringify(entries));
+      saveUserEntries();
       closeModal();
       renderEntries();
       updateInsights();
@@ -1002,7 +1019,7 @@ function setDefaultDate() {
     function deleteEntry(id) {
       if (!confirm('Delete this entry?')) return;
       entries = entries.filter(e => e.id !== id);
-      localStorage.setItem('wellnessEntries', JSON.stringify(entries));
+      saveUserEntries();
       renderEntries();
       updateInsights();
       updateProfile();
@@ -1422,8 +1439,12 @@ window.loginWithGoogle = function() {
 window.logoutUser = function() {
     auth.signOut()
         .then(() => {
+            currentUserId = null;
+            entries = [];
+
             localStorage.removeItem("lastAIKey");
             localStorage.removeItem("lastAIText");
+
             console.log("User logged out");
         })
         .catch((error) => {
@@ -1438,9 +1459,19 @@ auth.onAuthStateChanged((user) => {
     const dashScreen = document.getElementById("dashboard-screen");
 
     if (user) {
+        currentUserId = user.uid;
+        loadUserEntries();
+
         if (authScreen) authScreen.style.display = "none";
         if (dashScreen) dashScreen.style.display = "block";
+
+        renderEntries();
+        updateInsights();
+        updateProfile();
     } else {
+        currentUserId = null;
+        entries = [];
+
         if (authScreen) authScreen.style.display = "block";
         if (dashScreen) dashScreen.style.display = "none";
     }
