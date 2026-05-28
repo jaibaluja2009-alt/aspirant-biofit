@@ -1402,12 +1402,14 @@ if (hydrationCard) hydrationCard.innerText = hydrationLine ? hydrationLine[1].tr
          } catch (error) {
     console.error("AI Error:", error);
 
-    const errorText = "AI error: " + (error.message || error);
+  console.error("AI Error:", error);
 
-    if (moodCard) moodCard.innerText = errorText;
-    if (sleepCard) sleepCard.innerText = errorText;
-    if (studyCard) studyCard.innerText = errorText;
-    if (hydrationCard) hydrationCard.innerText = errorText;
+const errorText = "AI insights are temporarily unavailable. Please try again later.";
+
+if (sleepCard) sleepCard.innerText = errorText;
+if (moodCard) moodCard.innerText = errorText;
+if (studyCard) studyCard.innerText = errorText;
+if (hydrationCard) hydrationCard.innerText = errorText;
 }
     };
     
