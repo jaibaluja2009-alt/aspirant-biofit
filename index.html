@@ -1321,38 +1321,53 @@ function setDefaultDate() {
     const auth = firebase.auth();
 
     
-    // 1. Force the app to remember the user forever
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .catch((error) => {
-          console.error("Persistence error:", error);
-      });
+  let isSignUp = false;
 
-    // 2. Your login / signup function
-    window.handleAuth = function() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        if(!email || !password) return alert('Please fill in all fields');
+window.toggleForm = function() {
+    isSignUp = !isSignUp;
 
-        if(typeof isSignUp !== 'undefined' && isSignUp) {
-            auth.createUserWithEmailAndPassword(email, password).catch(err => alert(err.message));
-        } else {
-            auth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
-        }
+    const title = document.getElementById("form-title");
+    const mainBtn = document.getElementById("main-btn");
+    const toggleLink = document.getElementById("toggle-link");
+
+    if (isSignUp) {
+        title.textContent = "Create your AspirantBioFit account";
+        mainBtn.textContent = "Sign Up";
+        toggleLink.textContent = "Already have an account? Login";
+    } else {
+        title.textContent = "Welcome to AspirantBioFit";
+        mainBtn.textContent = "Login";
+        toggleLink.textContent = "Don't have an account? Sign Up";
+    }
+};
+
+window.handleAuth = function() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+        alert("Please fill in all fields");
+        return;
     }
 
-    // 3. Automatically skip the login screen if already logged in
-    auth.onAuthStateChanged((user) => {
-        const authScreen = document.getElementById('auth-screen');
-        const dashScreen = document.getElementById('dashboard-screen');
+    if (isSignUp) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .catch((err) => alert(err.message));
+    } else {
+        auth.signInWithEmailAndPassword(email, password)
+            .catch((err) => alert(err.message));
+    }
+};
 
-        if (user) {
-            if (authScreen) authScreen.style.display = 'none';
-            if (dashScreen) dashScreen.style.display = 'block';
-        } else {
-            if (authScreen) authScreen.style.display = 'block';
-            if (dashScreen) dashScreen.style.display = 'none';
-        }
-    });
+window.loginWithGoogle = function() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    auth.signInWithPopup(provider)
+        .catch((error) => {
+            console.error("Google login error:", error);
+            alert(error.message);
+        });
+};
      
 // Change the opening line to a module script so it can use the modern importer
 </script> 
