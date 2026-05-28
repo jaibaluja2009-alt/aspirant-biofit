@@ -1352,76 +1352,51 @@ function setDefaultDate() {
      
 // Change the opening line to a module script so it can use the modern importer
 </script> 
-<script type="module">
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai@0.21.0";
+<script>
+window.generateAIInsights = async function(sleep, study, water, mood) {
+    const moodCard = document.getElementById('mood-insight-text');
+    const sleepCard = document.getElementById('sleep-insight-text');
+    const studyCard = document.getElementById('study-insight-text');
+    const hydrationCard = document.getElementById('hydration-insight-text');
 
-    window.generateAIInsights = async function(sleep, study, water, mood) {
-        const GEMINI_API_KEY = "AQ.Ab8RN6L-sYaS3UTWbQLj8A5DCfojp5rrRWJqTqrRM1EePksurQ";
-        
-        const moodCard = document.getElementById('mood-insight-text');
-        const sleepCard = document.getElementById('sleep-insight-text');
-        const studyCard = document.getElementById('study-insight-text');
-        const hydrationCard = document.getElementById('hydration-insight-text');
+    if (moodCard) moodCard.innerText = "🧠 AI Coach is analyzing your mood...";
+    if (sleepCard) sleepCard.innerText = "⚡ Analyzing patterns...";
+    if (studyCard) studyCard.innerText = "📚 Checking balance...";
+    if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";
 
-        // Set all cards to a loading state so the user knows the AI is working
-        if (moodCard) moodCard.innerText = "🧠 AI Coach is analyzing your mood...";
-        if (sleepCard) sleepCard.innerText = "⚡ Analyzing patterns...";
-        if (studyCard) studyCard.innerText = "📚 Checking balance...";
-if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";     
+    try {
+        const response = await fetch("/api/gemini-insights", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ sleep, study, water, mood })
+        });
 
-        try {
-          const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
-         
-                  const promptText = `
-You are a realistic but supportive wellness coach for a student preparing for exams.
+        const aiText = await response.json();
 
-Today's data:
-Sleep: ${sleep} hours
-Study: ${study} hours
-Water: ${water} glasses
-Mood: ${mood}
-
-Write exactly 4 lines in this format:
-Sleep: short specific sleep insight
-Mood: short specific mood insight
-Study: short specific study insight
-Hydration: short specific hydration insight
-
-Rules:
-- Keep each line under 18 words.
-- No markdown.
-- No bullets.
-- No extra introduction.
-`;
-
-const result = await model.generateContent(promptText);
-const aiReply = result.response.text().trim();
-
-const sleepLine = aiReply.match(/Sleep:\s*(.*)/i);
-const moodLine = aiReply.match(/Mood:\s*(.*)/i);
-const studyLine = aiReply.match(/Study:\s*(.*)/i);
-const hydrationLine = aiReply.match(/Hydration:\s*(.*)/i);
-
-if (sleepCard) sleepCard.innerText = sleepLine ? sleepLine[1].trim() : aiReply;
-if (moodCard) moodCard.innerText = moodLine ? moodLine[1].trim() : aiReply;
-if (studyCard) studyCard.innerText = studyLine ? studyLine[1].trim() : aiReply;
-if (hydrationCard) hydrationCard.innerText = hydrationLine ? hydrationLine[1].trim() : aiReply;
-
-                } catch (error) {
-            console.error("AI Error:", error);
-
-            const errorText = "AI insights are temporarily unavailable. Please try again later.";
-
-            if (sleepCard) sleepCard.innerText = errorText;
-            if (moodCard) moodCard.innerText = errorText;
-            if (studyCard) studyCard.innerText = errorText;
-            if (hydrationCard) hydrationCard.innerText = errorText;
+        if (!response.ok) {
+            throw new Error(aiText.error || "AI request failed");
         }
-localStorage.setItem("lastAIText", JSON.stringify(aiText));
-}
-    };
-    
+
+        if (sleepCard) sleepCard.innerText = aiText.sleep;
+        if (moodCard) moodCard.innerText = aiText.mood;
+        if (studyCard) studyCard.innerText = aiText.study;
+        if (hydrationCard) hydrationCard.innerText = aiText.hydration;
+
+        localStorage.setItem("lastAIText", JSON.stringify(aiText));
+
+    } catch (error) {
+        console.error("AI Error:", error);
+
+        const errorText = "AI insights are temporarily unavailable. Please try again later.";
+
+        if (sleepCard) sleepCard.innerText = errorText;
+        if (moodCard) moodCard.innerText = errorText;
+        if (studyCard) studyCard.innerText = errorText;
+        if (hydrationCard) hydrationCard.innerText = errorText;
+    }
+};
 </script>
 </body>
 </html>
