@@ -800,6 +800,9 @@
             </div>
             <div class="switch active" id="notifications-switch" onclick="toggleNotifications()"></div>
           </div>
+         <button onclick="logoutUser()" class="btn w-full py-2.5 mt-5 text-white bg-red-500 hover:bg-red-600 rounded-xl font-semibold">
+            Logout
+          </button>
         </div>
       </div>
     </div>
@@ -1381,6 +1384,18 @@ window.loginWithGoogle = function() {
     auth.signInWithRedirect(provider)
         .catch((error) => {
             console.error("Google redirect start error:", error);
+            alert(error.message);
+        });
+};
+     window.logoutUser = function() {
+    auth.signOut()
+        .then(() => {
+            localStorage.removeItem("lastAIKey");
+            localStorage.removeItem("lastAIText");
+            console.log("User logged out");
+        })
+        .catch((error) => {
+            console.error("Logout error:", error);
             alert(error.message);
         });
 };
