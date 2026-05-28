@@ -1114,11 +1114,19 @@ function setDefaultDate() {
 
       renderSleepChart();
       renderMoodChart();
-         if (entries.length > 0 && typeof generateAIInsights === "function") {
+     if (entries.length > 0 && typeof generateAIInsights === "function") {
   const latestEntry = entries[entries.length - 1];
   const aiKey = `${latestEntry.id}-${latestEntry.sleepHours}-${latestEntry.studyHours}-${latestEntry.waterIntake}-${latestEntry.mood}`;
 
-  if (localStorage.getItem("lastAIKey") !== aiKey) {
+  const savedAIKey = localStorage.getItem("lastAIKey");
+  const savedAIText = JSON.parse(localStorage.getItem("lastAIText") || "null");
+
+  if (savedAIKey === aiKey && savedAIText) {
+    document.getElementById("sleep-insight-text").innerText = savedAIText.sleep;
+    document.getElementById("mood-insight-text").innerText = savedAIText.mood;
+    document.getElementById("study-insight-text").innerText = savedAIText.study;
+    document.getElementById("hydration-insight-text").innerText = savedAIText.hydration;
+  } else {
     localStorage.setItem("lastAIKey", aiKey);
 
     generateAIInsights(
@@ -1129,6 +1137,7 @@ function setDefaultDate() {
     );
   }
 }
+        
     }
 
     
@@ -1406,10 +1415,19 @@ if (hydrationCard) hydrationCard.innerText = hydrationLine ? hydrationLine[1].tr
 
 const errorText = "AI insights are temporarily unavailable. Please try again later.";
 
-if (sleepCard) sleepCard.innerText = errorText;
-if (moodCard) moodCard.innerText = errorText;
-if (studyCard) studyCard.innerText = errorText;
-if (hydrationCard) hydrationCard.innerText = errorText;
+const aiText = {
+  sleep: sleepLine ? sleepLine[1].trim() : aiReply,
+  mood: moodLine ? moodLine[1].trim() : aiReply,
+  study: studyLine ? studyLine[1].trim() : aiReply,
+  hydration: hydrationLine ? hydrationLine[1].trim() : aiReply
+};
+
+if (sleepCard) sleepCard.innerText = aiText.sleep;
+if (moodCard) moodCard.innerText = aiText.mood;
+if (studyCard) studyCard.innerText = aiText.study;
+if (hydrationCard) hydrationCard.innerText = aiText.hydration;
+
+localStorage.setItem("lastAIText", JSON.stringify(aiText));
 }
     };
     
