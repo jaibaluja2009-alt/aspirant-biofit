@@ -789,6 +789,7 @@
           </h3>
                     <div class="space-y-5">
 
+                     
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <svg id="bell-icon" class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -807,11 +808,17 @@
               <p class="text-sm font-semibold text-foreground mb-1">Account</p>
               <p class="text-xs text-muted-foreground">Logged in as</p>
               <p id="logged-in-email" class="text-sm font-medium text-foreground break-all mt-1">Loading...</p>
+
+              <button onclick="switchGoogleAccount()" class="btn w-full py-2.5 mt-4 text-white bg-teal-600 hover:bg-teal-700 rounded-xl font-semibold">
+                Switch Google Account
+              </button>
             </div>
 
             <button onclick="logoutUser()" class="btn w-full py-2.5 text-white bg-red-500 hover:bg-red-600 rounded-xl font-semibold">
               Logout
             </button>
+
+          </div>
 
           </div>
         </div>
@@ -1451,6 +1458,58 @@ window.loginWithGoogle = function() {
         });
 };
 
+     window.switchGoogleAccount = function() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    provider.setCustomParameters({
+        prompt: "select_account"
+    });
+
+    auth.signOut()
+        .then(() => {
+            currentUserId = null;
+            entries = [];
+
+            localStorage.removeItem("lastAIKey");
+            localStorage.removeItem("lastAIText");
+
+            return auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        })
+        .then(() => {
+            return auth.signInWithPopup(provider);
+        })
+        .then((result) => {
+            if (result && result.user) {
+                console.log("Switched to:", result.user.email);
+
+                currentUserId = result.user.uid;
+                loadUserEntries();
+
+                const loggedInEmail = document.getElementById("logged-in-email");
+                if (loggedInEmail) {
+                    loggedInEmail.textContent = result.user.email || "Google account";
+                }
+
+                renderEntries();
+                updateInsights();
+                updateProfile();
+
+                const authScreen = document.getElementById("auth-screen");
+                const dashScreen = document.getElementById("dashboard-screen");
+
+                if (authScreen) authScreen.style.display = "none";
+                if (dashScreen) dashScreen.style.display = "block";
+            }
+        })
+        .catch((error) => {
+            console.error("Switch account error:", error);
+
+            if (error.code !== "auth/cancelled-popup-request") {
+                alert(error.message);
+            }
+        });
+};
+
 window.logoutUser = function() {
     auth.signOut()
         .then(() => {
@@ -1481,6 +1540,11 @@ auth.onAuthStateChanged((user) => {
     if (user) {
         currentUserId = user.uid;
         loadUserEntries();
+
+     const loggedInEmail = document.getElementById("logged-in-email");
+if (loggedInEmail) {
+    loggedInEmail.textContent = user.email || "Google account";
+}
 
      const loggedInEmail = document.getElementById("logged-in-email");
 if (loggedInEmail) {
