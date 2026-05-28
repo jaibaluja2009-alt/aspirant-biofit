@@ -787,22 +787,33 @@
             </svg>
             Settings
           </h3>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <svg id="bell-icon" class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              <div>
-                <p class="text-sm font-medium text-foreground">Daily Reminders</p>
-                <p class="text-xs text-muted-foreground">Get reminded to log your wellness</p>
+                    <div class="space-y-5">
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg id="bell-icon" class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-foreground">Daily Reminders</p>
+                  <p class="text-xs text-muted-foreground">Get reminded to log your wellness</p>
+                </div>
               </div>
+              <div class="switch active" id="notifications-switch" onclick="toggleNotifications()"></div>
             </div>
-            <div class="switch active" id="notifications-switch" onclick="toggleNotifications()"></div>
+
+            <div class="rounded-xl p-4" style="background-color: var(--secondary);">
+              <p class="text-sm font-semibold text-foreground mb-1">Account</p>
+              <p class="text-xs text-muted-foreground">Logged in as</p>
+              <p id="logged-in-email" class="text-sm font-medium text-foreground break-all mt-1">Loading...</p>
+            </div>
+
+            <button onclick="logoutUser()" class="btn w-full py-2.5 text-white bg-red-500 hover:bg-red-600 rounded-xl font-semibold">
+              Logout
+            </button>
+
           </div>
-         <button onclick="logoutUser()" class="btn w-full py-2.5 mt-5 text-white bg-red-500 hover:bg-red-600 rounded-xl font-semibold">
-            Logout
-          </button>
         </div>
       </div>
     </div>
@@ -1471,6 +1482,11 @@ auth.onAuthStateChanged((user) => {
         currentUserId = user.uid;
         loadUserEntries();
 
+     const loggedInEmail = document.getElementById("logged-in-email");
+if (loggedInEmail) {
+    loggedInEmail.textContent = user.email || "Google account";
+}
+
         if (authScreen) authScreen.style.display = "none";
         if (dashScreen) dashScreen.style.display = "block";
 
@@ -1480,6 +1496,11 @@ auth.onAuthStateChanged((user) => {
     } else {
         currentUserId = null;
         entries = [];
+
+     const loggedInEmail = document.getElementById("logged-in-email");
+if (loggedInEmail) {
+    loggedInEmail.textContent = "";
+}
 
         if (authScreen) authScreen.style.display = "block";
         if (dashScreen) dashScreen.style.display = "none";
