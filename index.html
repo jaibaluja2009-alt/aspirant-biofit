@@ -1361,34 +1361,14 @@ function setDefaultDate() {
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-// 1. Keep user logged in after refresh
+// 1. Keep the user logged in
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .catch((error) => {
         console.error("Persistence error:", error);
     });
 
-// 2. Login / Sign Up toggle
-let isSignUp = false;
 
-window.toggleForm = function() {
-    isSignUp = !isSignUp;
-
-    const title = document.getElementById("form-title");
-    const mainBtn = document.getElementById("main-btn");
-    const toggleLink = document.getElementById("toggle-link");
-
-    if (isSignUp) {
-        if (title) title.textContent = "Create your Wellora account";
-        if (mainBtn) mainBtn.textContent = "Sign Up";
-        if (toggleLink) toggleLink.textContent = "Already have an account? Login";
-    } else {
-        if (title) title.textContent = "Welcome to Wellora";
-        if (mainBtn) mainBtn.textContent = "Login";
-        if (toggleLink) toggleLink.textContent = "Don't have an account? Sign Up";
-    }
-};
-
-// 3. Email/password login and signup
+// 2. Email/password login and signup
 window.handleAuth = function() {
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -1401,7 +1381,7 @@ window.handleAuth = function() {
         return;
     }
 
-    if (isSignUp) {
+    if (typeof isSignUp !== "undefined" && isSignUp) {
         auth.createUserWithEmailAndPassword(email, password)
             .catch((error) => {
                 console.error("Sign up error:", error);
@@ -1416,9 +1396,10 @@ window.handleAuth = function() {
     }
 };
 
+
+// 3. Google login
 let googleLoginInProgress = false;
 
-// 4. Google login
 window.loginWithGoogle = function() {
     if (googleLoginInProgress) {
         return;
@@ -1427,46 +1408,55 @@ window.loginWithGoogle = function() {
     googleLoginInProgress = true;
 
     const provider = new firebase.auth.GoogleAuthProvider();
+
     provider.setCustomParameters({
         prompt: "select_account"
     });
 
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         .then(() => {
-            // Use redirect on mobile, popup on desktop
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                return auth.signInWithRedirect(provider);
-            } else {
-                return auth.signInWithPopup(provider);
-            }
+            return auth.signInWithPopup(provider);
         })
         .then((result) => {
-            // Popup login reaches here.
-            // Redirect login does NOT; it returns to the page and is handled below.
             if (result && result.user) {
-                console.log("Google login successful:", result.user.email);
+                console.log(
+                    "Google login successful:",
+                    result.user.email
+                );
+
+                currentUserId = result.user.uid;
+
+                const authScreen =
+                    document.getElementById("auth-screen");
+
+                const dashScreen =
+                    document.getElementById("dashboard-screen");
+
+                if (authScreen) {
+                    authScreen.style.display = "none";
+                }
+
+                if (dashScreen) {
+                    dashScreen.style.display = "block";
+                }
             }
         })
         .catch((error) => {
-            console.error("Google login error:", error);
+            console.error("Google popup login error:", error);
 
             if (error.code !== "auth/cancelled-popup-request") {
                 alert(error.message);
             }
-
-            googleLoginInProgress = false;
         })
         .finally(() => {
-            // For redirect, the page navigates away before this matters.
             googleLoginInProgress = false;
         });
 };
 
 
-// 5. Switch Google account
+// 4. Switch Google account
 window.switchGoogleAccount = function() {
+
     const provider = new firebase.auth.GoogleAuthProvider();
 
     provider.setCustomParameters({
@@ -1475,32 +1465,67 @@ window.switchGoogleAccount = function() {
 
     auth.signOut()
         .then(() => {
+
             currentUserId = null;
             entries = [];
 
+            localStorage.removeItem("wellnessEntries");
             localStorage.removeItem("lastAIKey");
             localStorage.removeItem("lastAIText");
 
-            return auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            return auth.setPersistence(
+                firebase.auth.Auth.Persistence.LOCAL
+            );
         })
         .then(() => {
-            // Use redirect on mobile, popup on desktop
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                return auth.signInWithRedirect(provider);
-            } else {
-                return auth.signInWithPopup(provider);
-            }
+            return auth.signInWithPopup(provider);
         })
         .then((result) => {
-            // Popup login
+
             if (result && result.user) {
-                console.log("Switched to:", result.user.email);
+
+                console.log(
+                    "Switched to:",
+                    result.user.email
+                );
+
+                currentUserId = result.user.uid;
+
+                loadUserEntries();
+
+                const loggedInEmail =
+                    document.getElementById("logged-in-email");
+
+                if (loggedInEmail) {
+                    loggedInEmail.textContent =
+                        result.user.email || "Google account";
+                }
+
+                const authScreen =
+                    document.getElementById("auth-screen");
+
+                const dashScreen =
+                    document.getElementById("dashboard-screen");
+
+                if (authScreen) {
+                    authScreen.style.display = "none";
+                }
+
+                if (dashScreen) {
+                    dashScreen.style.display = "block";
+                }
+
+                renderEntries();
+                updateInsights();
+                updateProfile();
             }
         })
         .catch((error) => {
-            console.error("Switch account error:", error);
+
+            console.error(
+                "Switch account error:",
+                error
+            );
 
             if (error.code !== "auth/cancelled-popup-request") {
                 alert(error.message);
@@ -1509,42 +1534,12 @@ window.switchGoogleAccount = function() {
 };
 
 
-// 5A. Handle Google redirect when returning to the app
-auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            console.log("Google redirect login successful:", result.user.email);
-
-            currentUserId = result.user.uid;
-
-            const loggedInEmail = document.getElementById("logged-in-email");
-            if (loggedInEmail) {
-                loggedInEmail.textContent = result.user.email || "Google account";
-            }
-
-            loadUserEntries();
-            renderEntries();
-            updateInsights();
-            updateProfile();
-
-            const authScreen = document.getElementById("auth-screen");
-            const dashScreen = document.getElementById("dashboard-screen");
-
-            if (authScreen) authScreen.style.display = "none";
-            if (dashScreen) dashScreen.style.display = "block";
-        }
-    })
-    .catch((error) => {
-        console.error("Google redirect result error:", error);
-
-        if (error.code !== "auth/cancelled-popup-request") {
-            alert(error.message);
-        }
-    });
-     
+// 5. Logout
 window.logoutUser = function() {
+
     auth.signOut()
         .then(() => {
+
             currentUserId = null;
             entries = [];
 
@@ -1559,41 +1554,65 @@ window.logoutUser = function() {
             console.log("User logged out");
         })
         .catch((error) => {
+
             console.error("Logout error:", error);
             alert(error.message);
         });
 };
-     
+
+
 // 6. Show dashboard when logged in
 auth.onAuthStateChanged((user) => {
-    const authScreen = document.getElementById("auth-screen");
-    const dashScreen = document.getElementById("dashboard-screen");
+
+    const authScreen =
+        document.getElementById("auth-screen");
+
+    const dashScreen =
+        document.getElementById("dashboard-screen");
+
+    const loggedInEmail =
+        document.getElementById("logged-in-email");
+
 
     if (user) {
+
         currentUserId = user.uid;
+
         loadUserEntries();
-     
-     const loggedInEmail = document.getElementById("logged-in-email");
-if (loggedInEmail) {
-    loggedInEmail.textContent = user.email || "Google account";
-}
-        if (authScreen) authScreen.style.display = "none";
-        if (dashScreen) dashScreen.style.display = "block";
+
+        if (loggedInEmail) {
+            loggedInEmail.textContent =
+                user.email || "Google account";
+        }
+
+        if (authScreen) {
+            authScreen.style.display = "none";
+        }
+
+        if (dashScreen) {
+            dashScreen.style.display = "block";
+        }
 
         renderEntries();
         updateInsights();
         updateProfile();
+
     } else {
+
         currentUserId = null;
         entries = [];
 
-     const loggedInEmail = document.getElementById("logged-in-email");
-if (loggedInEmail) {
-    loggedInEmail.textContent = "";
-}
+        if (loggedInEmail) {
+            loggedInEmail.textContent = "";
+        }
 
-        if (authScreen) authScreen.style.display = "block";
-        if (dashScreen) dashScreen.style.display = "none";
+        if (authScreen) {
+            authScreen.style.display = "block";
+        }
+
+        if (dashScreen) {
+            dashScreen.style.display = "none";
+        }
     }
 });
     
