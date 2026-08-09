@@ -7,7 +7,7 @@
             <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
                 B
             </div>
-            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to Bio Fit</h2>
+            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to Wellora</h2>
             <p class="mt-2 text-sm text-slate-500">Track your cognitive and physical wellness journey</p>
         </div>
         <div class="mt-8 space-y-4">
@@ -32,7 +32,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AspirantBioFit - Wellness Tracker</title>
+  <title>Wellora - Wellness Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -391,7 +391,7 @@
     <div id="home-screen" class="screen active px-4 py-6">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-foreground">AspirantBioFit</h1>
+          <h1 class="text-2xl font-bold text-foreground">Wellora</h1>
           <p class="text-sm text-muted-foreground">Track your wellness journey</p>
         </div>
         <button onclick="toggleTheme()" class="btn btn-ghost p-2 rounded-full" id="theme-toggle">
@@ -1378,11 +1378,11 @@ window.toggleForm = function() {
     const toggleLink = document.getElementById("toggle-link");
 
     if (isSignUp) {
-        if (title) title.textContent = "Create your AspirantBioFit account";
+        if (title) title.textContent = "Create your Wellora account";
         if (mainBtn) mainBtn.textContent = "Sign Up";
         if (toggleLink) toggleLink.textContent = "Already have an account? Login";
     } else {
-        if (title) title.textContent = "Welcome to AspirantBioFit";
+        if (title) title.textContent = "Welcome to Wellora";
         if (mainBtn) mainBtn.textContent = "Login";
         if (toggleLink) toggleLink.textContent = "Don't have an account? Sign Up";
     }
