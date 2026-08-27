@@ -1,6 +1,6 @@
 {
-  "name": "AspirantBioFit",
-  "short_name": "BioFit",
+  "name": "Wellora",
+  "short_name": "Wellora",
   "description": "Cognitive efficiency tracking for competitive exam aspirants.",
   "start_url": "/",
   "display": "standalone",
