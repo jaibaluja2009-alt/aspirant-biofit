@@ -1,4 +1,5 @@
-
+<!DOCTYPE html>
+<html lang="en">
 
 
  <div id="auth-screen" style="display: block; background: linear-gradient(135deg, #ccfbf1 0%, #dbeafe 45%, #fef3c7 100%);" class="min-h-screen flex items-center justify-center px-4 py-12 font-sans">
@@ -33,6 +34,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Wellora - Wellness Tracker</title>
+     <link rel="manifest" href="/manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -1694,6 +1696,15 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
         if (hydrationCard) hydrationCard.innerText = errorText;
     }
 };
+</script>
+ <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('✓ Service Worker registered'))
+                .catch(err => console.log('✗ Service Worker registration failed:', err));
+        });
+    }
 </script>
 </body>
 </html>
