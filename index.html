@@ -848,7 +848,7 @@ body.auth-ready #app-loading {
               </button>
             </div>
 
-            <button onclick="handleLogout()" class="w-full py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all shadow-md shadow-red-100 active:scale-[0.98]">
+            <button <button onclick="logoutUser()" class="w-full py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all shadow-md shadow-red-100 active:scale-[0.98]">
              Logout
            </button>
           </div>
@@ -1592,7 +1592,25 @@ window.logoutUser = function() {
             alert(error.message);
         });
 };
+let isSignUp = false;
 
+window.toggleForm = function() {
+    isSignUp = !isSignUp;
+
+    const title = document.getElementById("form-title");
+    const button = document.getElementById("main-btn");
+    const link = document.getElementById("toggle-link");
+
+    if (isSignUp) {
+        title.textContent = "Create Account";
+        button.textContent = "Sign Up";
+        link.textContent = "Already have an account? Login";
+    } else {
+        title.textContent = "Wellora";
+        button.textContent = "Login";
+        link.textContent = "Don't have an account? Sign Up";
+    }
+};
 
 // 6. Show dashboard when logged in
 auth.onAuthStateChanged((user) => {
