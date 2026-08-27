@@ -1709,38 +1709,84 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
         });
     }
 </script>
-  <script>
-    function handleAuth() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        if (!email || !password) {
-            alert('Please enter email and password');
-            return;
-        }
-        
-        // Add your auth logic here (Firebase login)
-        console.log('Login:', email, password);
+ <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyBQwfJcezlTQLeBDzStzSjULTpYqILNiag",
+    authDomain: "aspirant-bio.firebaseapp.com",
+    projectId: "aspirant-bio",
+    storageBucket: "aspirant-bio.appspot.com",
+    messagingSenderId: "776820415980",
+    appId: "1:776820415980:web:966bae37c2e493c50db4c9"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+let isSignupMode = false;
+
+function toggleForm() {
+    isSignupMode = !isSignupMode;
+    const title = document.getElementById('form-title');
+    const btn = document.getElementById('main-btn');
+    const link = document.getElementById('toggle-link');
+    
+    if (isSignupMode) {
+        title.textContent = 'Create Account';
+        btn.textContent = 'Sign Up';
+        link.textContent = 'Already have an account? Login';
+    } else {
+        title.textContent = 'Wellora';
+        btn.textContent = 'Login';
+        link.textContent = "Don't have an account? Sign Up";
+    }
+}
+
+function handleAuth() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    if (!email || !password) {
+        alert('Enter email and password');
+        return;
     }
     
-    function toggleForm() {
-        const formTitle = document.getElementById('form-title');
-        const mainBtn = document.getElementById('main-btn');
-        const toggleLink = document.getElementById('toggle-link');
-        
-        if (formTitle.textContent === 'Wellora') {
-            formTitle.textContent = 'Create Account';
-            mainBtn.textContent = 'Sign Up';
-            toggleLink.textContent = 'Already have an account? Login';
-        } else {
-            formTitle.textContent = 'Wellora';
-            mainBtn.textContent = 'Login';
-            toggleLink.textContent = "Don't have an account? Sign Up";
-        }
+    if (isSignupMode) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+                alert('Account created!');
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+            })
+            .catch(err => alert(err.message));
+    } else {
+        auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+            })
+            .catch(err => alert(err.message));
     }
-    
-   
+}
+
+function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then(() => {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+        })
+        .catch(err => alert(err.message));
+}
+
+function handleLogout() {
+    auth.signOut().then(() => {
+        document.getElementById('dashboard-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'block';
+    });
+}
 </script>
- 
 </body>
 </html>
