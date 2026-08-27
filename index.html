@@ -396,7 +396,7 @@ body.auth-ready #app-loading {
             <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
                 W
             </div>
-            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to Wellora</h2>
+            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Wellora</h2>
             <p class="mt-2 text-sm text-slate-500">Track your cognitive and physical wellness journey</p>
         </div>
         <div class="mt-8 space-y-4">
@@ -411,9 +411,9 @@ body.auth-ready #app-loading {
     Continue with Google
 </button>
         </div>
-        <p id="toggle-link" onclick="toggleForm()" class="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium cursor-pointer transition-colors">
-            Don't have an account? Sign Up
-        </p>
+        <button id="toggle-link" onclick="toggleForm()" style="background: none; border: none; padding: 0; margin-top: 1rem; font-size: 0.875rem; color: #14b8a6; font-weight: 500; cursor: pointer; text-decoration: underline;">
+    Don't have an account? Sign Up
+</button>
     </div>
 </div>
 
@@ -848,9 +848,9 @@ body.auth-ready #app-loading {
               </button>
             </div>
 
-            <button onclick="logoutUser()" class="btn w-full py-2.5 text-white bg-red-500 hover:bg-red-600 rounded-xl font-semibold">
-              Logout
-            </button>
+            <button onclick="handleLogout()" style="margin-bottom: 100px;" class="w-full py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all shadow-md shadow-red-100 active:scale-[0.98]">
+    Logout
+</button>
 
           </div>
 
