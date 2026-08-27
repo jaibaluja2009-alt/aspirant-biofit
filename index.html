@@ -1,36 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
- <div id="auth-screen" style="display: block; background: linear-gradient(135deg, #ccfbf1 0%, #dbeafe 45%, #fef3c7 100%);" class="min-h-screen flex items-center justify-center px-4 py-12 font-sans">
-    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-center">
-        <div>
-            <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
-                W
-            </div>
-            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to Wellora</h2>
-            <p class="mt-2 text-sm text-slate-500">Track your cognitive and physical wellness journey</p>
-        </div>
-        <div class="mt-8 space-y-4">
-            <input type="email" id="email" placeholder="Enter your email" class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-sm bg-slate-50/50">
-            <input type="password" id="password" placeholder="Enter your password" class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-sm bg-slate-50/50">
-            
-            <button id="main-btn" onclick="handleAuth()" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
-                Login
-            </button>
-         <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 py-3 px-4 border border-slate-200 text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 transition-all shadow-sm active:scale-[0.98]">
-    <span style="font-size: 18px; font-weight: 700;">G</span>
-    Continue with Google
-</button>
-        </div>
-        <p id="toggle-link" onclick="toggleForm()" class="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium cursor-pointer transition-colors">
-            Don't have an account? Sign Up
-        </p>
-    </div>
-</div>
-
-    <div id="dashboard-screen" style="display: none;">
-
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Wellora - Wellness Tracker</title>
@@ -417,6 +387,39 @@ body.auth-ready #app-loading {
     }
   </style>
 
+</head>
+ 
+
+ <div id="auth-screen" style="display: block; background: linear-gradient(135deg, #ccfbf1 0%, #dbeafe 45%, #fef3c7 100%);" class="min-h-screen flex items-center justify-center px-4 py-12 font-sans">
+    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-center">
+        <div>
+            <div class="mx-auto h-12 w-12 rounded-xl bg-teal-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-teal-200">
+                W
+            </div>
+            <h2 id="form-title" class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Welcome to Wellora</h2>
+            <p class="mt-2 text-sm text-slate-500">Track your cognitive and physical wellness journey</p>
+        </div>
+        <div class="mt-8 space-y-4">
+            <input type="email" id="email" placeholder="Enter your email" class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-sm bg-slate-50/50">
+            <input type="password" id="password" placeholder="Enter your password" class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-200 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-sm bg-slate-50/50">
+            
+            <button id="main-btn" onclick="handleAuth()" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
+                Login
+            </button>
+         <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 py-3 px-4 border border-slate-200 text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 transition-all shadow-sm active:scale-[0.98]">
+    <span style="font-size: 18px; font-weight: 700;">G</span>
+    Continue with Google
+</button>
+        </div>
+        <p id="toggle-link" onclick="toggleForm()" class="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium cursor-pointer transition-colors">
+            Don't have an account? Sign Up
+        </p>
+    </div>
+</div>
+
+    <div id="dashboard-screen" style="display: none;">
+
+ 
   <div id="app" class="max-w-md mx-auto min-h-screen relative">
     <!-- Home Screen -->
     <div id="home-screen" class="screen active px-4 py-6">
