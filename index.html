@@ -1709,5 +1709,46 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
         });
     }
 </script>
+  <script>
+    function handleAuth() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if (!email || !password) {
+            alert('Please enter email and password');
+            return;
+        }
+        
+        // Add your auth logic here (Firebase login)
+        console.log('Login:', email, password);
+    }
+    
+    function toggleForm() {
+        const formTitle = document.getElementById('form-title');
+        const mainBtn = document.getElementById('main-btn');
+        const toggleLink = document.getElementById('toggle-link');
+        
+        if (formTitle.textContent === 'Wellora') {
+            formTitle.textContent = 'Create Account';
+            mainBtn.textContent = 'Sign Up';
+            toggleLink.textContent = 'Already have an account? Login';
+        } else {
+            formTitle.textContent = 'Wellora';
+            mainBtn.textContent = 'Login';
+            toggleLink.textContent = "Don't have an account? Sign Up";
+        }
+    }
+    
+    function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Add your logout logic here
+            alert('Logged out');
+        }
+    }
+    
+    function loginWithGoogle() {
+        alert('Google login - add your Firebase Google auth here');
+    }
+</script>
 </body>
 </html>
