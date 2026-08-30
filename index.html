@@ -1071,14 +1071,33 @@ function setDefaultDate() {
       updateProfile();
     }
 
-    function deleteEntry(id) {
-      if (!confirm('Delete this entry?')) return;
-      entries = entries.filter(e => e.id !== id);
-      saveUserEntries();
-      renderEntries();
-      updateInsights();
-      updateProfile();
-    }
+    let entryToDelete = null;
+
+function deleteEntry(id) {
+  entryToDelete = id;
+  const modal = document.getElementById('deleteModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeDeleteModal() {
+  entryToDelete = null;
+  const modal = document.getElementById('deleteModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+function confirmDelete() {
+  if (entryToDelete === null) return;
+
+  entries = entries.filter(e => e.id !== entryToDelete);
+  saveUserEntries();
+  renderEntries();
+  updateInsights();
+  updateProfile();
+
+  closeDeleteModal();
+}
 
     function filterEntries() {
       renderEntries();
@@ -1726,5 +1745,28 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
         });
     }
 </script>
+  <!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center z-50 p-4">
+  <div class="absolute inset-0 bg-black/50" onclick="closeDeleteModal()"></div>
+
+  <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white">Delete entry?</h2>
+    <p class="mt-2 text-gray-600 dark:text-gray-300">
+      Are you sure you want to delete this entry?
+    </p>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button onclick="closeDeleteModal()"
+        class="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300">
+        Cancel
+      </button>
+
+      <button onclick="confirmDelete()"
+        class="px-4 py-2 rounded-lg bg-red-500 text-white">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
