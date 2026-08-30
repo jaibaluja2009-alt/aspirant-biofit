@@ -1400,6 +1400,73 @@ function closeSoraChat() {
   chatPage.classList.add("hidden");
   chatPage.classList.remove("flex");
 }
+    async function sendSoraMessage() {
+  const input = document.getElementById("soraChatInput");
+  const messages = document.getElementById("soraMessages");
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  // Add the user's message safely
+  const userMessage = document.createElement("div");
+  userMessage.className =
+    "max-w-[85%] ml-auto bg-teal-600 text-white rounded-2xl rounded-tr-sm p-4 text-sm";
+  userMessage.textContent = message;
+  messages.appendChild(userMessage);
+
+  input.value = "";
+  messages.scrollTop = messages.scrollHeight;
+
+  // Show thinking message
+  const thinking = document.createElement("div");
+  thinking.className =
+    "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm text-gray-500 dark:text-gray-300";
+  thinking.textContent = "Sora is thinking...";
+  messages.appendChild(thinking);
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await response.json();
+    thinking.remove();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Chat request failed");
+    }
+
+    const reply = document.createElement("div");
+    reply.className =
+      "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap";
+    reply.textContent = data.reply;
+    messages.appendChild(reply);
+
+  } catch (error) {
+    console.error("Sora Chat Error:", error);
+    thinking.remove();
+
+    const errorMessage = document.createElement("div");
+    errorMessage.className =
+      "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl p-4 text-sm text-red-600";
+    errorMessage.textContent =
+      "Sora AI is temporarily unavailable. Please try again.";
+    messages.appendChild(errorMessage);
+  }
+
+  messages.scrollTop = messages.scrollHeight;
+}
+    document.getElementById("soraChatInput").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    sendSoraMessage();
+  }
+});
   </script>
 
 
