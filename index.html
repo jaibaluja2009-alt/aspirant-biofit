@@ -1784,7 +1784,10 @@ auth.onAuthStateChanged((user) => {
 
 </script> 
 <script>
+  let aiInsightsLoading = false;
 window.generateAIInsights = async function(sleep, study, water, mood) {
+  if (aiInsightsLoading) return;
+aiInsightsLoading = true;
     const moodCard = document.getElementById('mood-insight-text');
     const sleepCard = document.getElementById('sleep-insight-text');
     const studyCard = document.getElementById('study-insight-text');
@@ -1826,6 +1829,8 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
         if (moodCard) moodCard.innerText = errorText;
         if (studyCard) studyCard.innerText = errorText;
         if (hydrationCard) hydrationCard.innerText = errorText;
+    }finally {
+        aiInsightsLoading = false;
     }
 };
 </script>
