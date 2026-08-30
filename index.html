@@ -1422,7 +1422,7 @@ function closeSoraChat() {
   const thinking = document.createElement("div");
   thinking.className =
     "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm text-gray-500 dark:text-gray-300";
-  thinking.textContent = "Sora is thinking...";
+ thinking.textContent = "Sora is thinking ✨";
   messages.appendChild(thinking);
   messages.scrollTop = messages.scrollHeight;
 
@@ -1467,8 +1467,8 @@ console.log("Sora Chat Response:", response.status, data);
     const errorMessage = document.createElement("div");
     errorMessage.className =
       "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl p-4 text-sm text-red-600";
-    errorMessage.textContent =
-  "Chat error: " + error.message;
+  errorMessage.textContent =
+  "I'm having trouble responding right now. Please try again in a moment.";
     messages.appendChild(errorMessage);
   }
 
