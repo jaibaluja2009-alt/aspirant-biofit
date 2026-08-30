@@ -1791,7 +1791,7 @@ auth.onAuthStateChanged((user) => {
 </script> 
 <script>
   let aiInsightsLoading = false;
-window.generateAIInsights = async function(sleep, study, water, mood) {
+window.generateAIInsights = async function(sleep, study, water, mood, aiKey) {
   if (aiInsightsLoading) return;
 aiInsightsLoading = true;
     const moodCard = document.getElementById('mood-insight-text');
@@ -1825,9 +1825,12 @@ aiInsightsLoading = true;
         if (hydrationCard) hydrationCard.innerText = aiText.hydration;
 
         localStorage.setItem("lastAIText", JSON.stringify(aiText));
+      localStorage.setItem("lastAIKey", aiKey);
+localStorage.removeItem("failedAIKey");
 
     } catch (error) {
         console.error("AI Error:", error);
+      localStorage.setItem("failedAIKey", aiKey);
 
         const errorText = "AI insights are temporarily unavailable. Please try again later.";
 
