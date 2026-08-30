@@ -1395,6 +1395,8 @@ function confirmDelete() {
       if (e.target === this) closeModal();
     });
     let soraConversation = [];
+    let soraLastMessageTime = 0;
+const SORA_COOLDOWN = 5000;
     function openSoraChat() {
   const chatPage = document.getElementById("soraChatPage");
   chatPage.classList.remove("hidden");
@@ -1413,6 +1415,13 @@ function closeSoraChat() {
   const message = input.value.trim();
 
   if (!message) return;
+      // Prevent messages from being sent too quickly
+const now = Date.now();
+if (now - soraLastMessageTime < SORA_COOLDOWN) {
+  return;
+}
+
+soraLastMessageTime = now;
 
   // Add the user's message safely
   const userMessage = document.createElement("div");
