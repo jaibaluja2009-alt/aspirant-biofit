@@ -1468,7 +1468,7 @@ console.log("Sora Chat Response:", response.status, data);
     errorMessage.className =
       "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl p-4 text-sm text-red-600";
   errorMessage.textContent =
-  "I'm having trouble responding right now. Please try again in a moment.";
+  "Error: " + error.message;
     messages.appendChild(errorMessage);
   }
 
