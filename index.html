@@ -1780,6 +1780,86 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
                 .catch(err => console.log('✗ Service Worker registration failed:', err));
         });
     }
+   async function sendChatMessage() {
+    const input = document.getElementById("chatInput");
+    const messages = document.getElementById("chatMessages");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    // Show user's message
+    messages.innerHTML += `
+        <div class="bg-teal-600 text-white rounded-xl p-3 text-sm ml-8">
+            ${escapeHtml(message)}
+        </div>
+    `;
+
+    input.value = "";
+    messages.scrollTop = messages.scrollHeight;
+
+    // Show loading message
+    const loadingId = "loading-" + Date.now();
+    messages.innerHTML += `
+        <div id="${loadingId}" class="bg-gray-100 dark:bg-gray-700 rounded-xl p-3 text-sm text-gray-500">
+            Sora is thinking...
+        </div>
+    `;
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+
+        document.getElementById(loadingId)?.remove();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Chat request failed");
+        }
+
+        messages.innerHTML += `
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-3 text-sm text-gray-700 dark:text-gray-200 mr-8 whitespace-pre-line">
+                ${escapeHtml(data.reply)}
+            </div>
+        `;
+
+    } catch (error) {
+        document.getElementById(loadingId)?.remove();
+
+        messages.innerHTML += `
+            <div class="bg-red-50 dark:bg-red-900/30 rounded-xl p-3 text-sm text-red-600 dark:text-red-300">
+                Sorry, Sora AI is temporarily unavailable. Please try again.
+            </div>
+        `;
+    }
+
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Allow pressing Enter to send
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("chatInput");
+
+    if (input) {
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                sendChatMessage();
+            }
+        });
+    }
+});
 </script>
   <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 hidden items-center justify-center z-50 p-4">
