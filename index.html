@@ -1426,15 +1426,22 @@ function closeSoraChat() {
   messages.appendChild(thinking);
   messages.scrollTop = messages.scrollHeight;
 
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
+ // Remember the user's message
+soraConversation.push({
+  role: "user",
+  text: message
+});
 
+try {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      messages: soraConversation
+    })
+  });
     const data = await response.json();
 console.log("Sora Chat Response:", response.status, data);
     thinking.remove();
