@@ -24,6 +24,10 @@
     {
       "src": "public/**/*",
       "use": "@vercel/static"
+    },
+    {
+      "src": ".well-known/assetlinks.json",
+      "use": "@vercel/static"
     }
   ],
   "headers": [
