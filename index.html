@@ -1388,6 +1388,18 @@ function confirmDelete() {
     document.getElementById('entry-modal').addEventListener('click', function(e) {
       if (e.target === this) closeModal();
     });
+    function openSoraChat() {
+  const chatPage = document.getElementById("soraChatPage");
+  chatPage.classList.remove("hidden");
+  chatPage.classList.add("flex");
+  document.getElementById("soraChatInput").focus();
+}
+
+function closeSoraChat() {
+  const chatPage = document.getElementById("soraChatPage");
+  chatPage.classList.add("hidden");
+  chatPage.classList.remove("flex");
+}
   </script>
 
 
