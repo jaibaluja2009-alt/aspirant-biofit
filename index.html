@@ -1418,9 +1418,20 @@ function closeSoraChat() {
       // Prevent messages from being sent too quickly
 const now = Date.now();
 if (now - soraLastMessageTime < SORA_COOLDOWN) {
+  const remainingSeconds = Math.ceil(
+    (SORA_COOLDOWN - (now - soraLastMessageTime)) / 1000
+  );
+
+  const waitMessage = document.createElement("div");
+  waitMessage.className =
+    "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm text-gray-500 dark:text-gray-300";
+  waitMessage.textContent =
+    `Please wait ${remainingSeconds} second${remainingSeconds === 1 ? "" : "s"} before sending another message.`;
+
+  messages.appendChild(waitMessage);
+  messages.scrollTop = messages.scrollHeight;
   return;
 }
-
 soraLastMessageTime = now;
 
   // Add the user's message safely
