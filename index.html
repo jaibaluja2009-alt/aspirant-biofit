@@ -1684,7 +1684,7 @@ window.generateAIInsights = async function(sleep, study, water, mood) {
     if (hydrationCard) hydrationCard.innerText = "💧 Checking water patterns...";
 
     try {
-        const response = await fetch("/api/gemini-insights", {
+        const response = await fetch("/api/gemini-insights.js", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
