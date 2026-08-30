@@ -1219,20 +1219,26 @@ function confirmDelete() {
 
   const savedAIKey = localStorage.getItem("lastAIKey");
   const savedAIText = JSON.parse(localStorage.getItem("lastAIText") || "null");
+  const failedAIKey = localStorage.getItem("failedAIKey");
 
+  // Use the previously generated insight for this same entry
   if (savedAIKey === aiKey && savedAIText) {
     document.getElementById("sleep-insight-text").innerText = savedAIText.sleep;
     document.getElementById("mood-insight-text").innerText = savedAIText.mood;
     document.getElementById("study-insight-text").innerText = savedAIText.study;
     document.getElementById("hydration-insight-text").innerText = savedAIText.hydration;
-  } else {
-    localStorage.setItem("lastAIKey", aiKey);
 
+  // Don't automatically retry an entry that already failed
+  } else if (failedAIKey === aiKey) {
+    // Keep the current unavailable message without making another API request
+
+  } else {
     generateAIInsights(
       latestEntry.sleepHours,
       latestEntry.studyHours,
       latestEntry.waterIntake,
-      latestEntry.mood
+      latestEntry.mood,
+      aiKey
     );
   }
 }
