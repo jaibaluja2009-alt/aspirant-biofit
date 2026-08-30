@@ -1761,6 +1761,10 @@ auth.onAuthStateChanged((user) => {
         if (dashScreen) {
             dashScreen.style.display = "block";
         }
+      const soraButton = document.getElementById("openSoraChat");
+if (soraButton) {
+    soraButton.classList.remove("hidden");
+}
 
         renderEntries();
         updateInsights();
@@ -1782,6 +1786,10 @@ auth.onAuthStateChanged((user) => {
         if (dashScreen) {
             dashScreen.style.display = "none";
         }
+      const soraButton = document.getElementById("openSoraChat");
+if (soraButton) {
+    soraButton.classList.add("hidden");
+}
     }
  document.body.classList.add("auth-ready");
 });
