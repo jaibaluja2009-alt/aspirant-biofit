@@ -4,10 +4,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { message } = req.body || {};
+        const { messages } = req.body || {};
 
-        if (!message || typeof message !== "string") {
-            return res.status(400).json({ error: "Please enter a message" });
+        if (!Array.isArray(messages) || messages.length === 0) {
+            return res.status(400).json({ error: "No messages provided" });
         }
 
         const apiKey = process.env.GEMINI_API_KEY;
@@ -18,23 +18,29 @@ export default async function handler(req, res) {
             });
         }
 
-        const promptText = `
-You are Sora AI, a friendly and supportive wellness and study assistant for students.
+        // Keep only recent messages to avoid unnecessarily large requests
+        const recentMessages = messages.slice(-12);
 
-Answer the user's question helpfully and clearly. You can help with:
-- Study habits and productivity
-- General wellness habits
-- Sleep routines
-- Hydration
-- Motivation and organization
+        const contents = [
+            {
+                role: "user",
+                parts: [{
+                    text: `You are Sora AI, a friendly wellness and study companion for students.
 
-Keep answers concise and easy to understand.
-Do not claim to diagnose medical or mental health conditions.
-For serious health concerns, encourage the user to talk to a trusted adult or qualified professional.
+You help with study habits, productivity, general wellness, sleep routines,
+hydration, motivation, and organization.
 
-User's message:
-${message}
-`;
+Be supportive, practical, and concise. Remember the context of the conversation.
+
+Do not diagnose medical or mental health conditions. For serious health concerns,
+encourage the user to speak with a trusted adult or qualified professional.`
+                }]
+            },
+            ...recentMessages.map(msg => ({
+                role: msg.role === "model" ? "model" : "user",
+                parts: [{ text: String(msg.text || "") }]
+            }))
+        ];
 
         const geminiResponse = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
@@ -43,24 +49,14 @@ ${message}
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: promptText
-                                }
-                            ]
-                        }
-                    ]
-                })
+                body: JSON.stringify({ contents })
             }
         );
 
         const data = await geminiResponse.json();
 
         if (!geminiResponse.ok) {
-            console.error("Gemini API Error:", data);
+            console.error("Gemini Chat API Error:", data);
             return res.status(geminiResponse.status).json({
                 error: data?.error?.message || "Gemini API request failed"
             });
@@ -74,8 +70,6 @@ ${message}
 
     } catch (error) {
         console.error("Server Chat Error:", error);
-        return res.status(500).json({
-            error: "Server chat error"
-        });
+        return res.status(500).json({ error: "Server chat error" });
     }
 }
