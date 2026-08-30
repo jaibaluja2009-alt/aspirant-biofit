@@ -1388,6 +1388,7 @@ function confirmDelete() {
     document.getElementById('entry-modal').addEventListener('click', function(e) {
       if (e.target === this) closeModal();
     });
+    let soraConversation = [];
     function openSoraChat() {
   const chatPage = document.getElementById("soraChatPage");
   chatPage.classList.remove("hidden");
@@ -1446,6 +1447,10 @@ console.log("Sora Chat Response:", response.status, data);
     reply.className =
       "max-w-[85%] bg-white dark:bg-gray-800 rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap";
     reply.textContent = data.reply;
+    soraConversation.push({
+  role: "model",
+  text: data.reply
+});
     messages.appendChild(reply);
 
   } catch (error) {
