@@ -1213,6 +1213,7 @@ function confirmDelete() {
 
       renderSleepChart();
       renderMoodChart();
+      console.log("AI Insights check:", entries.length, typeof generateAIInsights);
      if (entries.length > 0 && typeof generateAIInsights === "function") {
   const latestEntry = entries[entries.length - 1];
   const aiKey = `${latestEntry.id}-${latestEntry.sleepHours}-${latestEntry.studyHours}-${latestEntry.waterIntake}-${latestEntry.mood}`;
