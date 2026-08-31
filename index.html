@@ -1234,6 +1234,7 @@ function confirmDelete() {
     // Keep the current unavailable message without making another API request
 
   } else {
+    console.log("Calling generateAIInsights for:", aiKey);
     generateAIInsights(
       latestEntry.sleepHours,
       latestEntry.studyHours,
