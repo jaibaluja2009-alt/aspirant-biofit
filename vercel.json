@@ -6,11 +6,19 @@
       "use": "@vercel/node"
     },
     {
-  "src": "api/chat.js",
-  "use": "@vercel/node"
-},
+      "src": "api/chat.js",
+      "use": "@vercel/node"
+    },
     {
       "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "privacy-policy.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "account-deletion.html",
       "use": "@vercel/static"
     },
     {
